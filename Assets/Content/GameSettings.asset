@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4baa244fe7ddf04187747f60f72ade3, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: 
+  _networkGameBoardPrefab: {fileID: 3277740182329711982, guid: 444f50cf21ea8ac4f883436126c7b684, type: 3}
+  _worldSettings:
+    _seed: 31415
+    _heightFrequency: 0.1
+    _obstacleThreshold: 0.6
+    _peakThreshold: 0.75
+    _slopeChance: 0.1
+    _materialsFrequency: 0.05
+    _materialsCount: 3
+    _resourcesFrequency: 3
+    _resourceChance: 0.1
+  _chunkSize: 10
+  _physicalChunkPrefab: {fileID: -6171339396602173047, guid: 0603fcdc2e8d25444a031def8b570873, type: 3}
+  _visualChunkPrefab: {fileID: -1184203244107602237, guid: f3897d171b3c42744b79f6efb7c7e1cd, type: 3}
+  _networkPlayerCharacterPrefab: {fileID: 1320459629569986847, guid: 009989f7c45e9e54793ed8f2e98fbddf, type: 3}
+  _playerSettings:
+    _radius: 0.3
+    _speed: 2
+    _stepHeight: 0.1
+    _visionSize: 10
+  _networkWalkerPrefab: {fileID: 631194264314177072, guid: 034931b4b3106ba449873023e4e07961, type: 3}
+  _networkStriderPrefab: {fileID: 3656394588385818919, guid: 2206b7d53c9268548b8de6bd3b0ddeb0, type: 3}
+  _enemySettings:
+    _radius: 0.15
+    _speed: 1
+    _stepHeight: 0.1
+    _touchDistance: 0.7
+    _pathToleranceDistance: 0.5
+    _pathEndToleranceDistance: 2
+    _horizontalRushDistance: 0.8
+    _enemiesPerPlayer: 3
+    _spawnDistanceRange:
+      x: 3
+      y: 5

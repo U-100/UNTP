@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center;">
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        <ui:Label tabindex="-1" text="Waiting for players..." display-tooltip-when-elided="true" enable-rich-text="false" style="font-size: 48px; -unity-text-align: middle-center; color: rgb(255, 255, 255); -unity-font-definition: url(&apos;project://database/Assets/Content/Fonts/Countach-Bold%20SDF.asset?fileID=11400000&amp;guid=7691bea94cc288342b16e7460222bc08&amp;type=2#Countach-Bold SDF&apos;);" />
+        <ui:VisualElement style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+            <ui:Label tabindex="-1" text="Connected:" display-tooltip-when-elided="true" enable-rich-text="false" style="font-size: 24px; -unity-text-align: middle-center; color: rgb(255, 255, 255);" />
+            <ui:Label tabindex="-1" text="???" display-tooltip-when-elided="true" enable-rich-text="false" name="HostLobbyPlayersCounter" style="font-size: 24px; -unity-text-align: middle-center; color: rgb(255, 255, 255);" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); height: 50px;" />
+        <ui:Button tabindex="-1" text="Play" display-tooltip-when-elided="true" name="HostLobbyPlayButton" style="font-size: 96px; color: rgb(255, 255, 255); background-color: rgba(88, 88, 88, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); -unity-font-definition: url(&apos;project://database/Assets/Content/Fonts/Countach-Bold%20SDF.asset?fileID=11400000&amp;guid=7691bea94cc288342b16e7460222bc08&amp;type=2#Countach-Bold SDF&apos;);" />
+        <ui:Button tabindex="-1" text="Cancel" display-tooltip-when-elided="true" name="HostLobbyCancelButton" style="font-size: 96px; color: rgb(255, 255, 255); background-color: rgba(88, 88, 88, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); -unity-font-definition: url(&apos;project://database/Assets/Content/Fonts/Countach-Bold%20SDF.asset?fileID=11400000&amp;guid=7691bea94cc288342b16e7460222bc08&amp;type=2#Countach-Bold SDF&apos;);" />
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+    </ui:VisualElement>
+</ui:UXML>

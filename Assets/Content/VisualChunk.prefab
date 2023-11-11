@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9222112972076137429
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1448714583523162416}
+  - component: {fileID: -1184203244107602237}
+  m_Layer: 0
+  m_Name: VisualChunk
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1448714583523162416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9222112972076137429}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-1184203244107602237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9222112972076137429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d553ed8594f887e49a411f5fab0964da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _materials:
+  - {fileID: 2100000, guid: 7cfbe0b1d07f3844fad748f2865c6a7a, type: 2}
+  - {fileID: 2100000, guid: 86dd45af1273335419f31a451251b0b5, type: 2}
+  - {fileID: 2100000, guid: 9c1295de9c514bb48ab5f4e4e2b89843, type: 2}
+  _bevel: 0.05
+  _slopePrefabs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 4967084223598718676, guid: 55c4bb6b0fa50ed488854389011a778c, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 4236101633297656025, guid: 0aa385af17517a547bc8693bf1277acd, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 3633606285841048068, guid: 578a8fccca81e1c409c91e32dca317f9, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 1174472003617269921, guid: 8de3fbd4712dcc74981a114832d89bfe, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _resourcePrefabs:
+  - {fileID: 0}
+  - {fileID: 4211270676350108600, guid: 1a9bad7c996f0844e8cef8621d91d05f, type: 3}
+  - {fileID: 4211270676350108600, guid: bc50f6f89e23a9a4f9bc579247af8063, type: 3}
+  - {fileID: 4211270676350108600, guid: 1aed28f3c7398304fbaa5145892dfafd, type: 3}
+  _objectPrefabs:
+  - {fileID: 0}
+  - {fileID: 4211270676350108600, guid: 87f4d4fc1b1e19f4f8ee10266ad4aaed, type: 3}

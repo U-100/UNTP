@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="MainMenu" src="project://database/Assets/Content/UI/MainMenu.uxml?fileID=9197481963319205126&amp;guid=4f424260e670f9246913046833395e7c&amp;type=3#MainMenu" />
+    <ui:Template name="ErrorDialog" src="project://database/Assets/Content/UI/ErrorDialog.uxml?fileID=9197481963319205126&amp;guid=82e972f5033721d4697c43d90b0e76ca&amp;type=3#ErrorDialog" />
+    <ui:Template name="Loading" src="project://database/Assets/Content/UI/Loading.uxml?fileID=9197481963319205126&amp;guid=4a6fcb7ae810a3648a51218790c62ede&amp;type=3#Loading" />
+    <ui:Template name="HostLobby" src="project://database/Assets/Content/UI/HostLobby.uxml?fileID=9197481963319205126&amp;guid=c2023ab81f963c1449b65c43c01e9465&amp;type=3#HostLobby" />
+    <ui:Template name="ClientLobby" src="project://database/Assets/Content/UI/ClientLobby.uxml?fileID=9197481963319205126&amp;guid=aaf7d1a3bc96f364ba555abf17470c35&amp;type=3#ClientLobby" />
+    <ui:Template name="PauseDialog" src="project://database/Assets/Content/UI/PauseDialog.uxml?fileID=9197481963319205126&amp;guid=eab57c1f054502a42a6dca0e0be29f92&amp;type=3#PauseDialog" />
+    <ui:Template name="Hud" src="project://database/Assets/Content/UI/Hud.uxml?fileID=9197481963319205126&amp;guid=84b775f9827b2d54da1345c91c2777a3&amp;type=3#Hud" />
+    <Style src="project://database/Assets/Content/UI/UI.uss?fileID=7433441132597879392&amp;guid=425856cfda862794cbea8cf7630fb547&amp;type=3#UI" />
+    <ui:Instance template="MainMenu" name="MainMenu" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="ErrorDialog" name="ErrorDialog" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="Loading" name="Loading" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="HostLobby" name="HostLobby" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="ClientLobby" name="ClientLobby" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="PauseDialog" name="PauseDialog" class="fullparent" style="visibility: hidden;" />
+    <ui:Instance template="Hud" name="Hud" class="fullparent" style="visibility: hidden;" />
+</ui:UXML>
