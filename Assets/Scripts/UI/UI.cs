@@ -36,16 +36,24 @@ namespace UNTP
 		void Resume();
 	}
 
-	public struct HudIndicator
+	public enum HudIndicatorKind
 	{
-		public float2 positionScreenPercent;
+		Ally,
+		SmallEnemy,
+		BigEnemy,
+	}
+	
+	public struct HudIndicatorData
+	{
+		public HudIndicatorKind kind;
+		public float2 positionScreenFactor;
 	}
 
 	public interface IHudViewModel : IDisposable
 	{
 		ConstructionState constructionState { get; }
 
-		public IReadOnlyList<HudIndicator> CalculateIndicators();
+		public IReadOnlyList<HudIndicatorData> CalculateIndicators();
 	}
 
 	public class UI : MonoBehaviour
@@ -89,7 +97,6 @@ namespace UNTP
 		private VisualElement _hud;
 		
 		private VisualElement _hudIndicatorsArea;
-		private VisualTreeAsset _hudIndicatorAsset;
 		
 		private VisualElement _hudLeftStickOuterKnob;
 		private VisualElement _hudLeftStickInnerKnob;
@@ -158,8 +165,6 @@ namespace UNTP
 
 			this._hudIndicatorsArea = this._hud.Q<VisualElement>("HudIndicatorsArea");
 
-			this._hudIndicatorAsset = Resources.Load<VisualTreeAsset>("HudIndicator");
-			
 			this._hudLeftStickOuterKnob = this._hud.Q<VisualElement>("HudLeftStickOuterKnob");
 			this._hudLeftStickInnerKnob = this._hud.Q<VisualElement>("HudLeftStickInnerKnob");
 			this._hudLeftStickTouchArea = this._hud.Q<VisualElement>("HudLeftStickTouchArea");
@@ -284,7 +289,7 @@ namespace UNTP
 				this._hudConfirmConstructionPlacementButton.visible = this.viewModel.hud?.constructionState == ConstructionState.ConstructionAllowed;
 				this._hudCancelConstructionPlacementButton.visible = this.viewModel.hud?.constructionState != ConstructionState.NoConstruction;
 
-				IReadOnlyList<HudIndicator> indicators = this.viewModel.hud?.CalculateIndicators();
+				IReadOnlyList<HudIndicatorData> indicators = this.viewModel.hud?.CalculateIndicators();
 				int indicatorsCount = indicators?.Count ?? 0;
 				
 				// ensure that we have no more hud indicators then we have enemies
@@ -293,19 +298,23 @@ namespace UNTP
 
 				// ensure that we have enough hud indicators for all enemies
 				while (this._hudIndicatorsArea.childCount < indicatorsCount)
-					this._hudIndicatorsArea.Add(this._hudIndicatorAsset.Instantiate());
+					this._hudIndicatorsArea.Add(new HudIndicator());
 
 				if (indicators is not null)
 				{
 					for (int indicatorIndex = 0; indicatorIndex < indicatorsCount; ++indicatorIndex)
 					{
-						float2 indicatorPositionScreenPercent = indicators[indicatorIndex].positionScreenPercent;
-						VisualElement indicatorVisualElement = this._hudIndicatorsArea.ElementAt(indicatorIndex);
+						if (this._hudIndicatorsArea.ElementAt(indicatorIndex) is HudIndicator hudIndicator)
+						{
+							HudIndicatorData hudIndicatorData = indicators[indicatorIndex];
+							hudIndicator.EnableInClassList("ally-indicator", hudIndicatorData.kind == HudIndicatorKind.Ally);
+							hudIndicator.EnableInClassList("big-enemy-indicator", hudIndicatorData.kind == HudIndicatorKind.BigEnemy);
+							hudIndicator.EnableInClassList("small-enemy-indicator", hudIndicatorData.kind == HudIndicatorKind.SmallEnemy);
+							// TODO: don't forget to add classes for new enum values, or rework this code
 
-						indicatorVisualElement.style.position = Position.Absolute;
-						indicatorVisualElement.style.left = Length.Percent(indicatorPositionScreenPercent.x);
-						indicatorVisualElement.style.top = Length.Percent(indicatorPositionScreenPercent.y);
-						indicatorVisualElement.transform.rotation = Quaternion.FromToRotation(new Vector3(0, -1, 0), new Vector3(50, 50, 0) - (Vector3)(Vector2)indicatorPositionScreenPercent);
+							hudIndicator.xFactor = hudIndicatorData.positionScreenFactor.x;
+							hudIndicator.yFactor = hudIndicatorData.positionScreenFactor.y;
+						}
 					}
 				}
 			}

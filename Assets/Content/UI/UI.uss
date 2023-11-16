@@ -5,3 +5,54 @@
     width: 100%;
     height: 100%;
 }
+
+.hud-indicator {
+    --icon-size: 30;
+    --mark-size: 10;
+    --mark-spacing: 2;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.hud-indicator.big-enemy-indicator {
+    --icon-size: 50;
+    --mark-size: 25;
+    --mark-spacing: 5;
+}
+
+.hud-indicator.ally-indicator .hud-indicator__content-area {
+    background-image: url('project://database/Assets/Content/UI/Icons/vr-headset.svg?fileID=7388822144124034973&guid=8e84a0f97b3fb0b4e8ace408e8509f98&type=3#vr-headset');
+    -unity-background-image-tint-color: rgb(0, 255, 0);
+}
+
+.hud-indicator.big-enemy-indicator .hud-indicator__content-area {
+    background-image: url('project://database/Assets/Content/UI/Icons/delivery-drone.svg?fileID=7388822144124034973&guid=2aa4423be88d01c49acd158ea3283b70&type=3#delivery-drone');
+    -unity-background-image-tint-color: rgb(255, 0, 0);
+}
+
+.hud-indicator.small-enemy-indicator .hud-indicator__content-area {
+    background-image: url('project://database/Assets/Content/UI/Icons/cyber-eye.svg?fileID=7388822144124034973&guid=7169c543e34a23246aeb093ced075ea7&type=3#cyber-eye');
+    -unity-background-image-tint-color: rgb(255, 0, 0);
+}
+
+.hud-indicator.ally-indicator .hud-indicator__mark {
+    background-image: url('project://database/Assets/Content/UI/Icons/play-button.svg?fileID=7388822144124034973&guid=9f0f056ae9f8d1849930ff1834fad076&type=3#play-button');
+    rotate: -90deg;
+    top: -100px;
+    -unity-background-image-tint-color: rgb(0, 255, 0);
+}
+
+.hud-indicator.big-enemy-indicator .hud-indicator__mark {
+    background-image: url('project://database/Assets/Content/UI/Icons/play-button.svg?fileID=7388822144124034973&guid=9f0f056ae9f8d1849930ff1834fad076&type=3#play-button');
+    rotate: -90deg;
+    top: -100px;
+    -unity-background-image-tint-color: rgb(255, 0, 0);
+}
+
+.hud-indicator.small-enemy-indicator .hud-indicator__mark {
+    background-image: url('project://database/Assets/Content/UI/Icons/play-button.svg?fileID=7388822144124034973&guid=9f0f056ae9f8d1849930ff1834fad076&type=3#play-button');
+    rotate: -90deg;
+    top: -100px;
+    -unity-background-image-tint-color: rgb(255, 0, 0);
+}

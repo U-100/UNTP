@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="MainMenu" style="flex-grow: 1; overflow: hidden; display: flex; position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+    <Style src="project://database/Assets/Content/UI/UI.uss?fileID=7433441132597879392&amp;guid=425856cfda862794cbea8cf7630fb547&amp;type=3#UI" />
+    <ui:VisualElement name="MainMenu" class="fullparent">
         <ui:VisualElement name="MainArea" style="flex-grow: 1; align-items: center;">
             <ui:VisualElement style="flex-grow: 1;" />
             <ui:Label tabindex="-1" text="Unity Netcode Test Project (UNTP)" display-tooltip-when-elided="true" enable-rich-text="false" style="font-size: 48px; -unity-text-align: middle-center; color: rgb(255, 255, 255); -unity-font-definition: url(&apos;project://database/Assets/Content/UI/Fonts/Countach-Bold%20SDF.asset?fileID=11400000&amp;guid=7691bea94cc288342b16e7460222bc08&amp;type=2#Countach-Bold SDF&apos;);" />
