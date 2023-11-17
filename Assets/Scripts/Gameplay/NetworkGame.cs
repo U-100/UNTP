@@ -13,8 +13,8 @@ namespace UNTP
 		private readonly NetworkVariable<NetworkGameState> _state = new();
 
 		public bool isInLobby => this._state.Value == NetworkGameState.Lobby;
-		public bool isServer => this.NetworkManager.IsServer;
-		public bool isClient => this.NetworkManager.IsClient;
+		public bool isServer => this.IsServer;
+		public bool isClient => this.IsClient;
 		public bool isPaused => this._state.Value != NetworkGameState.Playing;
 
 		public void StartPlaying() => this._state.Value = NetworkGameState.Playing;

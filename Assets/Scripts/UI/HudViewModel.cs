@@ -26,24 +26,10 @@ namespace UNTP
 			{
 				int requiredIndicatorsCount = 0;
 
-				// int playersCount = this._gameplay.gameBoard.players.count;
-				// for (int playerIndex = 0; playerIndex < playersCount; ++playerIndex)
-				// {
-				// 	if (TryGetAllyIndicator(this._gameplay.gameBoard.players[playerIndex], out HudIndicatorData indicator))
-				// 	{
-				// 		if (requiredIndicatorsCount < this._indicators.Count)
-				// 			this._indicators[requiredIndicatorsCount] = indicator;
-				// 		else
-				// 			this._indicators.Insert(requiredIndicatorsCount, indicator);
-				// 		
-				// 		++requiredIndicatorsCount;
-				// 	}
-				// }
-				
-				int enemiesCount = this._gameplay.gameBoard.enemies.count;
-				for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
+				int playersCount = this._gameplay.gameBoard.players.count;
+				for (int playerIndex = 0; playerIndex < playersCount; ++playerIndex)
 				{
-					if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
+					if (TryGetAllyIndicator(this._gameplay.gameBoard.players[playerIndex], out HudIndicatorData indicator))
 					{
 						if (requiredIndicatorsCount < this._indicators.Count)
 							this._indicators[requiredIndicatorsCount] = indicator;
@@ -53,6 +39,20 @@ namespace UNTP
 						++requiredIndicatorsCount;
 					}
 				}
+				
+				// int enemiesCount = this._gameplay.gameBoard.enemies.count;
+				// for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
+				// {
+				// 	if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
+				// 	{
+				// 		if (requiredIndicatorsCount < this._indicators.Count)
+				// 			this._indicators[requiredIndicatorsCount] = indicator;
+				// 		else
+				// 			this._indicators.Insert(requiredIndicatorsCount, indicator);
+				// 		
+				// 		++requiredIndicatorsCount;
+				// 	}
+				// }
 			
 				if (this._indicators.Count > requiredIndicatorsCount)
 					this._indicators.RemoveRange(requiredIndicatorsCount, this._indicators.Count - requiredIndicatorsCount);

@@ -60,15 +60,27 @@ namespace UNTP
 		{
 			Debug.Log($"Starting host on port {this._connectionPort}");
 
-			this._networkManager.GetComponent<UnityTransport>().SetConnectionData(null, this._connectionPort, "0.0.0.0"); // listen on any ipv4 address
-			this._networkManager.StartHost();
-
-			await RunServerAdvertisement();
-
-			while (this._networkManager.IsHost)
+			try
 			{
-				this._gameLogic.Update(this.gameBoard, Time.deltaTime);
-				await Task.Yield();
+				this._networkManager.GetComponent<UnityTransport>().SetConnectionData(null, this._connectionPort, "0.0.0.0"); // listen on any ipv4 address
+				this._networkManager.StartHost();
+
+				await RunServerAdvertisement();
+
+				while (this._networkManager.IsHost)
+				{
+					this._gameLogic.Update(this.gameBoard, Time.deltaTime);
+					await Task.Yield();
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogException(ex);
+				throw;
+			}
+			finally
+			{
+				Debug.Log("Exiting HostGameplay.Start()");
 			}
 		}
 
