@@ -160,8 +160,6 @@ namespace UNTP
 
         private IVisualChunk CreateVisualChunk(int2 chunkPosition)
         {
-            //Debug.Log($"Creating visual chunk {chunkPosition}");
-
             VisualChunk visualChunk = this._visualChunkFactory(FromChunkPosition(chunkPosition));
             visualChunk.Fill(this, this._chunkSize);
             this._visualChunks[chunkPosition] = visualChunk;
@@ -170,14 +168,11 @@ namespace UNTP
 
         private void DestroyVisualChunk(VisualChunk visualChunk)
         {
-            //Debug.Log($"Destroying visual chunk {visualChunk.transform.position}");
             Destroy(visualChunk.gameObject);
         }
 
         private IPhysicalChunk CreatePhysicalChunk(int2 chunkPosition)
         {
-            //Debug.Log($"Creating physical chunk {chunkPosition}");
-
             PhysicalChunk physicalChunk = this._physicalChunkFactory(FromChunkPosition(chunkPosition));
             physicalChunk.Fill(this, this._chunkSize);
             this._physicalChunks[chunkPosition] = physicalChunk;
@@ -186,7 +181,6 @@ namespace UNTP
 
         private void DestroyPhysicalChunk(PhysicalChunk physicalChunk)
         {
-            //Debug.Log($"Destroying physical chunk {physicalChunk.transform.position}");
             Destroy(physicalChunk.gameObject);
         }
 
