@@ -60,7 +60,7 @@ namespace UNTP
 			GameObject gameObject = networkGameBoard.gameObject;
 
 			gameObject.GetComponent<NetworkWorldMap>().Init(this.worldGen, this.gameSettings.chunkSize, this.CreateVisualChunk, this.CreatePhysicalChunk);
-			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.networkPlayerCharacterFactory);
+			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.networkPlayerFactory, this.networkPlayerCharacterFactory);
 			gameObject.GetComponent<NetworkEnemyRepository>().Init(this.networkWalkerFactory, this.networkStriderFactory);
 		}
 
@@ -91,6 +91,9 @@ namespace UNTP
 
 		private WorldGen _worldGen;
 		public IWorldGen worldGen => this._worldGen ??= new WorldGen(this.gameSettings.worldSettings);
+
+		private NetworkPrefabInstanceFactory<NetworkPlayer> _networkPlayerFactory;
+		public NetworkPrefabInstanceFactory<NetworkPlayer> networkPlayerFactory => this._networkPlayerFactory ?? new NetworkPrefabInstanceFactory<NetworkPlayer>(this.gameSettings.networkPlayerPrefab);
 
 		private NetworkPrefabInstanceFactory<NetworkPlayerCharacter> _networkPlayerCharacterFactory;
 		public NetworkPrefabInstanceFactory<NetworkPlayerCharacter> networkPlayerCharacterFactory => this._networkPlayerCharacterFactory ?? new NetworkPrefabInstanceFactory<NetworkPlayerCharacter>(this.gameSettings.networkPlayerCharacterPrefab);

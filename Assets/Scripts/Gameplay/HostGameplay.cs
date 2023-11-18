@@ -21,7 +21,7 @@ namespace UNTP
 		private readonly List<IDisposable> _disposables = new();
 
 		private CancellationTokenSource _serverAdvertisementCts;
-		private NetworkGameBoard _networkGameBoard;
+		private NetworkGameBoard _gameBoard;
 
 		public HostGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, INetworkPrefabFactory<NetworkGameBoard> gameBoardFactory, IGameLogic gameLogic)
 		{
@@ -54,7 +54,7 @@ namespace UNTP
 			return this;
 		}
 
-		public IGameBoard gameBoard => this._networkGameBoard;
+		public IGameBoard gameBoard => this._gameBoard;
 
 		public async Task Start()
 		{
@@ -120,28 +120,28 @@ namespace UNTP
 		{
 			Debug.Log("Server started");
 
-			this._networkGameBoard = this._gameBoardFactory.Create(this._networkManager.LocalClientId, float3.zero, quaternion.identity);
-			this._networkGameBoard.NetworkObject.Spawn();
+			this._gameBoard = this._gameBoardFactory.Create(this._networkManager.LocalClientId, float3.zero, quaternion.identity);
+			this._gameBoard.NetworkObject.Spawn();
 		}
 
 		private void OnServerStopped(bool obj)
 		{
 			Debug.Log("Server stopped");
 
-			this._networkGameBoard = null;
+			this._gameBoard = null;
 		}
 
 		private void OnClientConnected(ulong clientId)
 		{
 			Debug.Log($"Client {clientId} connected");
 
-			NetworkObject clientPlayerNetworkObject = this._networkManager.SpawnManager.GetPlayerNetworkObject(clientId);
-			NetworkPlayer networkPlayer = clientPlayerNetworkObject.GetComponent<NetworkPlayer>();
-			networkPlayer.networkGameBoard = this._networkGameBoard;
+			this._gameBoard.networkPlayersRepository.CreatePlayerWithClientId(clientId);
 		}
 
 		private void OnClientDisconnected(ulong clientId)
 		{
+			this._gameBoard.networkPlayersRepository.DestroyPlayerWithClientId(clientId);
+
 			Debug.Log($"Client {clientId} disconnected");
 		}
 	}

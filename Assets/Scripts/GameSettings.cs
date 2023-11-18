@@ -28,6 +28,9 @@ namespace UNTP
 
 		[Header("Player")]
 
+		[SerializeField] private NetworkPlayer _networkPlayerPrefab;
+		public NetworkPlayer networkPlayerPrefab => this._networkPlayerPrefab;
+
 		[SerializeField] private NetworkPlayerCharacter _networkPlayerCharacterPrefab;
 		public NetworkPlayerCharacter networkPlayerCharacterPrefab => this._networkPlayerCharacterPrefab;
 

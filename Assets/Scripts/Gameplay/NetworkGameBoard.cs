@@ -15,7 +15,6 @@ namespace UNTP
 		public IPlayersRepository players => this._networkPlayersRepository;
 		public IEnemyRepository enemies => this._networkEnemyRepository;
 
-		public void PutPlayerOnBoard(NetworkPlayer networkPlayer) => this._networkPlayersRepository.PutPlayerOnBoard(networkPlayer);
-		public void RemovePlayerFromBoard(NetworkPlayer networkPlayer) => this._networkPlayersRepository.RemovePlayerFromBoard(networkPlayer);
+		public NetworkPlayersRepository networkPlayersRepository => this._networkPlayersRepository;
 	}
 }

@@ -1,22 +1,48 @@
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace UNTP
 {
 	public class NetworkPlayersRepository : NetworkBehaviour, IPlayersRepository
 	{
+		private INetworkPrefabFactory<NetworkPlayer> _playerFactory;
 		private INetworkPrefabFactory<NetworkPlayerCharacter> _playerCharacterFactory;
 
 		private readonly List<NetworkPlayer> _networkPlayers = new();
+		private NetworkPlayer _localPlayer;
 		
-		public void Init(INetworkPrefabFactory<NetworkPlayerCharacter> playerCharacterFactory) => this._playerCharacterFactory = playerCharacterFactory;
+		public void Init(INetworkPrefabFactory<NetworkPlayer> playerFactory, INetworkPrefabFactory<NetworkPlayerCharacter> playerCharacterFactory)
+		{
+			this._playerFactory = playerFactory;
+			this._playerCharacterFactory = playerCharacterFactory;
+		}
 
 		public int count => this._networkPlayers.Count;
 
 		public IPlayer this[int playerIndex] => this._networkPlayers[playerIndex];
 
-		public IPlayer localPlayer => this.NetworkManager.LocalClient.PlayerObject.GetComponent<NetworkPlayer>();
+		public IPlayer localPlayer
+		{
+			get
+			{
+				if(this._localPlayer == null)
+				{
+					foreach (NetworkPlayer networkPlayer in this._networkPlayers)
+					{
+						if (networkPlayer.IsOwner)
+						{
+							this._localPlayer = networkPlayer;
+							break;
+						}
+					}
+				}
+
+				return this._localPlayer;
+			}
+		}
 
 		public void CreateCharacterForPlayerAtIndex(int playerIndex, float3 position, quaternion rotation)
 		{
@@ -26,37 +52,53 @@ namespace UNTP
 			networkPlayer.SetNetworkPlayerCharacter(networkPlayerCharacter);
 		}
 
-		public void PutPlayerOnBoard(NetworkPlayer player)
+		public void CreatePlayerWithClientId(ulong ownerClientId)
 		{
-			// if (!this._networkPlayers.Contains(player))
-			// 	throw new Exception($"Player is already on the board");
-			
-			if (!this._networkPlayers.Contains(player))
-				this._networkPlayers.Add(player);
+			NetworkObject networkPlayerObject = CreateNetworkPlayer(ownerClientId, float3.zero, quaternion.identity);
+			networkPlayerObject.SpawnWithOwnership(ownerClientId);
 		}
 
-		public void RemovePlayerFromBoard(NetworkPlayer player)
+		public void DestroyPlayerWithClientId(ulong ownerClientId)
 		{
-			// if (!this._networkPlayers.Contains(player))
-			// 	throw new Exception("Player is not on the board");
-			
-			this._networkPlayers.Remove(player);
+			int removed = this._networkPlayers.RemoveAll(np => np.OwnerClientId == ownerClientId);
+			Debug.Log($"removed: {removed}");
 		}
-
+		
 		public override void OnNetworkSpawn()
 		{
 			if(!IsServer)
+			{
+				this.NetworkManager.AddNetworkPrefabHandler(this._playerFactory.prefab.gameObject, CreateNetworkPlayer, DestroyNetworkPlayer);
+
 				this.NetworkManager.AddNetworkPrefabHandler(
 					this._playerCharacterFactory.prefab.gameObject,
 					(ownerClientId, position, rotation) => this._playerCharacterFactory.Create(ownerClientId, position, rotation).NetworkObject,
 					networkObject => Destroy(networkObject.gameObject)
 				);
+			}
+		}
+
+		private NetworkObject CreateNetworkPlayer(ulong ownerClientId, Vector3 position, Quaternion rotation)
+		{
+			NetworkPlayer networkPlayer = this._playerFactory.Create(ownerClientId, position, rotation);
+			this._networkPlayers.Add(networkPlayer);
+			return networkPlayer.NetworkObject;
+		}
+
+		private void DestroyNetworkPlayer(NetworkObject networkObject)
+		{
+			NetworkPlayer networkPlayer = networkObject.GetComponent<NetworkPlayer>();
+			this._networkPlayers.Remove(networkPlayer);
+			Destroy(networkObject.gameObject);
 		}
 
 		public override void OnNetworkDespawn()
 		{
 			if(!IsServer)
+			{
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._playerFactory.prefab.gameObject);
 				this.NetworkManager.RemoveNetworkPrefabHandler(this._playerCharacterFactory.prefab.gameObject);
+			}
 		}
 	}
 }

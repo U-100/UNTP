@@ -57,8 +57,27 @@ namespace UNTP
 			return this;
 		}
 
-		public IGameBoard gameBoard => this._gameBoard ??= this._networkManager.LocalClient.PlayerObject != null ? this._networkManager.LocalClient.PlayerObject.GetComponent<NetworkPlayer>().networkGameBoard : null;
+		public IGameBoard gameBoard
+		{
+			get
+			{
+				if (this._gameBoard is null && this._networkManager.IsConnectedClient)
+				{
+					foreach (NetworkObject networkObject in this._networkManager.SpawnManager.SpawnedObjectsList)
+					{
+						NetworkGameBoard networkGameBoard = networkObject.GetComponent<NetworkGameBoard>();
+						if (networkGameBoard != null)
+						{
+							this._gameBoard = networkGameBoard;
+							break;
+						}
+					}
+				}
 
+				return this._gameBoard;
+			}
+		}
+		
 		public async Task Start()
 		{
 			this._searchForServersCts = new CancellationTokenSource();
