@@ -14,6 +14,7 @@ namespace UNTP
 		private readonly NetworkDiscovery _networkDiscovery;
 		private readonly NetworkManager _networkManager;
 		private readonly ushort _connectionPort;
+		private readonly NetworkGameBoard _networkGameBoardPrefab;
 		private readonly IGameLogic _gameLogic;
 
 		private readonly List<IDisposable> _disposables = new();
@@ -21,21 +22,31 @@ namespace UNTP
 		private CancellationTokenSource _searchForServersCts;
 		private NetworkGameBoard _networkGameBoard;
 
-		public ClientGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, IGameLogic gameLogic)
+		public delegate NetworkGameBoard NetworkGameBoardFactory();
+		public ClientGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, NetworkGameBoard networkGameBoardPrefab, NetworkGameBoardFactory networkGameBoardFactory, IGameLogic gameLogic)
 		{
 			this._networkDiscovery = networkDiscovery;
 			this._networkManager = networkManager;
 			this._connectionPort = connectionPort;
+			this._networkGameBoardPrefab = networkGameBoardPrefab;
 			this._gameLogic = gameLogic;
 
 			this._networkManager.OnClientStarted += this.OnClientStarted;
 			this._networkManager.OnClientStopped += this.OnClientStopped;
+			
+			this._networkManager.AddNetworkPrefabHandler(
+				this._networkGameBoardPrefab.gameObject,
+				(_, _, _) => networkGameBoardFactory().NetworkObject,
+				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+			);
 		}
 
 		public void Dispose()
 		{
 			this._networkManager.OnClientStarted -= this.OnClientStarted;
 			this._networkManager.OnClientStopped -= this.OnClientStopped;
+
+			this._networkManager.RemoveNetworkPrefabHandler(this._networkGameBoardPrefab.gameObject);
 
 			foreach (IDisposable disposable in this._disposables)
 				disposable.Dispose();

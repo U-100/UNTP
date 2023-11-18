@@ -6,22 +6,24 @@ namespace UNTP
 {
 	public class NetworkEnemyRepository : NetworkBehaviour, IEnemyRepository
 	{
+		private NetworkWalker _walkerPrefab;
 		public delegate NetworkWalker WalkerFactory(float3 position, quaternion rotation);
 		private WalkerFactory _walkerFactory;
 
+		private NetworkStrider _striderPrefab;
 		public delegate NetworkStrider StriderFactory(float3 position, quaternion rotation);
 		private StriderFactory _striderFactory;
 
-		private List<NetworkEnemy> _enemies;
+		private readonly List<NetworkEnemy> _enemies = new();
 
-
-		public NetworkEnemyRepository Init(WalkerFactory walkerFactory, StriderFactory striderFactory)
+		public NetworkEnemyRepository Init(NetworkWalker walkerPrefab, WalkerFactory walkerFactory, NetworkStrider striderPrefab, StriderFactory striderFactory)
 		{
+			this._walkerPrefab = walkerPrefab;
 			this._walkerFactory = walkerFactory;
+			this._striderPrefab = striderPrefab;
 			this._striderFactory = striderFactory;
 			return this;
 		}
-
 
 		public int count => this._enemies.Count;
 
@@ -50,11 +52,25 @@ namespace UNTP
 			Destroy(enemy.gameObject);
 		}
 
-		
 		public override void OnNetworkSpawn()
 		{
-			if (this.IsServer)
-				this._enemies = new List<NetworkEnemy>(); // in theory we only need the enemies array on server
+			this.NetworkManager.AddNetworkPrefabHandler(
+				this._walkerPrefab.gameObject,
+				(_, position, rotation) => this._walkerFactory(position, rotation).NetworkObject,
+				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+			);
+
+			this.NetworkManager.AddNetworkPrefabHandler(
+				this._striderPrefab.gameObject,
+				(_, position, rotation) => this._striderFactory(position, rotation).NetworkObject,
+				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+			);
+		}
+
+		public override void OnNetworkDespawn()
+		{
+			this.NetworkManager.RemoveNetworkPrefabHandler(this._walkerPrefab.gameObject);
+			this.NetworkManager.RemoveNetworkPrefabHandler(this._striderPrefab.gameObject);
 		}
 	}
 }

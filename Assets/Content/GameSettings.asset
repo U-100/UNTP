@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4baa244fe7ddf04187747f60f72ade3, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  _networkGameBoardPrefab: {fileID: 3277740182329711982, guid: 444f50cf21ea8ac4f883436126c7b684, type: 3}
+  _networkGameBoardPrefab: {fileID: 6361417070293084036, guid: 444f50cf21ea8ac4f883436126c7b684, type: 3}
   _worldSettings:
     _seed: 31415
     _heightFrequency: 0.1

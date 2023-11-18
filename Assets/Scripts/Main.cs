@@ -66,6 +66,8 @@ namespace UNTP
 					gameplayScope.networkDiscovery,
 					gameplayScope.networkManager,
 					gameplayScope.connectionPort,
+					gameplayScope.gameSettings.networkGameBoardPrefab,
+					gameplayScope.CreateNetworkGameBoard,
 					gameplayScope.gameLogic
 				);
 

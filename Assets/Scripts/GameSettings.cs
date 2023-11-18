@@ -7,8 +7,8 @@ namespace UNTP
 	{
 		[Header("General")]
 
-		[SerializeField] private GameObject _networkGameBoardPrefab;
-		public GameObject networkGameBoardPrefab => this._networkGameBoardPrefab;
+		[SerializeField] private NetworkGameBoard _networkGameBoardPrefab;
+		public NetworkGameBoard networkGameBoardPrefab => this._networkGameBoardPrefab;
 
 
 		[Header("Map generator")]

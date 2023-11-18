@@ -21,40 +21,11 @@ namespace UNTP
 
 			this.gameSettings = gameSettings;
 			this.networkManager = networkManager;
-
-			this.networkManager.AddNetworkPrefabHandler(
-				this.gameSettings.networkGameBoardPrefab,
-				(_, _, _) => CreateNetworkGameBoard().NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
-
-			this.networkManager.AddNetworkPrefabHandler(
-				this.gameSettings.networkPlayerCharacterPrefab.gameObject,
-				(_, position, rotation) => CreateNetworkPlayerCharacter(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
-
-			this.networkManager.AddNetworkPrefabHandler(
-				this.gameSettings.networkWalkerPrefab.gameObject,
-				(_, position, rotation) => CreateNetworkWalker(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
-
-			this.networkManager.AddNetworkPrefabHandler(
-				this.gameSettings.networkStriderPrefab.gameObject,
-				(_, position, rotation) => CreateNetworkStrider(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
 		}
 
 		public void Dispose()
 		{
 			Debug.Log("Disposing GameplayScope");
-
-			this.networkManager.RemoveNetworkPrefabHandler(this.gameSettings.networkGameBoardPrefab);
-			this.networkManager.RemoveNetworkPrefabHandler(this.gameSettings.networkPlayerCharacterPrefab.gameObject);
-			this.networkManager.RemoveNetworkPrefabHandler(this.gameSettings.networkWalkerPrefab.gameObject);
-			this.networkManager.RemoveNetworkPrefabHandler(this.gameSettings.networkStriderPrefab.gameObject);
 
 			foreach (IDisposable disposable in this._disposables)
 			{
@@ -82,11 +53,11 @@ namespace UNTP
 
 		public NetworkGameBoard CreateNetworkGameBoard()
 		{
-			GameObject gameObject = UnityEngine.Object.Instantiate(this.gameSettings.networkGameBoardPrefab);
+			GameObject gameObject = UnityEngine.Object.Instantiate(this.gameSettings.networkGameBoardPrefab.gameObject);
 
 			gameObject.GetComponent<NetworkWorldMap>().Init(this.worldGen, this.gameSettings.chunkSize, this.CreateVisualChunk, this.CreatePhysicalChunk);
-			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.CreateNetworkPlayerCharacter);
-			gameObject.GetComponent<NetworkEnemyRepository>().Init(this.CreateNetworkWalker, this.CreateNetworkStrider);
+			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.gameSettings.networkPlayerCharacterPrefab, this.CreateNetworkPlayerCharacter);
+			gameObject.GetComponent<NetworkEnemyRepository>().Init(this.gameSettings.networkWalkerPrefab, this.CreateNetworkWalker, this.gameSettings.networkStriderPrefab, this.CreateNetworkStrider);
 
 			return gameObject.GetComponent<NetworkGameBoard>();
 		}
