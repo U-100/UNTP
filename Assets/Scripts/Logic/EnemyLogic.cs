@@ -32,7 +32,7 @@ namespace UNTP
 		{
 			if (board.enemies.count < this._enemySettings.enemiesPerPlayer * board.players.count)
 			{
-				int randomPlayerIndex = this._random.NextInt(0, board.players.count - 1);
+				int randomPlayerIndex = this._random.NextInt(0, board.players.count);
 				IPlayer randomPlayer = board.players[randomPlayerIndex];
 
 				float randomAngle = this._random.NextFloat(0.0f, radians(360.0f));
