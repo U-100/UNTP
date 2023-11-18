@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace UNTP
 {
@@ -49,18 +50,37 @@ namespace UNTP
 		{
 			if (!IsServer)
 			{
-				this.NetworkManager.AddNetworkPrefabHandler(
-					this._walkerFactory.prefab.gameObject,
-					(ownerClientId, position, rotation) => this._walkerFactory.Create(ownerClientId, position, rotation).NetworkObject,
-					networkObject => Destroy(networkObject.gameObject)
-				);
-
-				this.NetworkManager.AddNetworkPrefabHandler(
-					this._striderFactory.prefab.gameObject,
-					(ownerClientId, position, rotation) => this._striderFactory.Create(ownerClientId, position, rotation).NetworkObject,
-					networkObject => Destroy(networkObject.gameObject)
-				);
+				this.NetworkManager.AddNetworkPrefabHandler(this._walkerFactory.prefab.gameObject, CreateNetworkWalker, DestroyNetworkWalker);
+				this.NetworkManager.AddNetworkPrefabHandler(this._striderFactory.prefab.gameObject, CreateNetworkStrider, DestroyNetworkStrider);
 			}
+		}
+
+		private NetworkObject CreateNetworkWalker(ulong ownerClientId, Vector3 position, Quaternion rotation)
+		{
+			NetworkWalker networkWalker = this._walkerFactory.Create(ownerClientId, position, rotation);
+			this._enemies.Add(networkWalker);
+			return networkWalker.NetworkObject;
+		}
+
+		private void DestroyNetworkWalker(NetworkObject networkObject)
+		{
+			NetworkWalker networkWalker = networkObject.GetComponent<NetworkWalker>();
+			this._enemies.Remove(networkWalker);
+			Destroy(networkObject.gameObject);
+		}
+
+		private NetworkObject CreateNetworkStrider(ulong ownerClientId, Vector3 position, Quaternion rotation)
+		{
+			NetworkStrider networkStrider = this._striderFactory.Create(ownerClientId, position, rotation);
+			this._enemies.Add(networkStrider);
+			return networkStrider.NetworkObject;
+		}
+
+		private void DestroyNetworkStrider(NetworkObject networkObject)
+		{
+			NetworkStrider networkStrider = networkObject.GetComponent<NetworkStrider>();
+			this._enemies.Remove(networkStrider);
+			Destroy(networkObject.gameObject);
 		}
 
 		public override void OnNetworkDespawn()

@@ -40,19 +40,19 @@ namespace UNTP
 					}
 				}
 				
-				// int enemiesCount = this._gameplay.gameBoard.enemies.count;
-				// for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
-				// {
-				// 	if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
-				// 	{
-				// 		if (requiredIndicatorsCount < this._indicators.Count)
-				// 			this._indicators[requiredIndicatorsCount] = indicator;
-				// 		else
-				// 			this._indicators.Insert(requiredIndicatorsCount, indicator);
-				// 		
-				// 		++requiredIndicatorsCount;
-				// 	}
-				// }
+				int enemiesCount = this._gameplay.gameBoard.enemies.count;
+				for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
+				{
+					if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
+					{
+						if (requiredIndicatorsCount < this._indicators.Count)
+							this._indicators[requiredIndicatorsCount] = indicator;
+						else
+							this._indicators.Insert(requiredIndicatorsCount, indicator);
+						
+						++requiredIndicatorsCount;
+					}
+				}
 			
 				if (this._indicators.Count > requiredIndicatorsCount)
 					this._indicators.RemoveRange(requiredIndicatorsCount, this._indicators.Count - requiredIndicatorsCount);
@@ -87,21 +87,24 @@ namespace UNTP
 		{
 			indicator = new HudIndicatorData();
 
-			float2 localPlayerPosition = this._gameplay.gameBoard.players.localPlayer.character.position.xz;
-			float2 enemyPosition = enemy.position.xz;
-			float2 delta = enemyPosition - localPlayerPosition;
-
-			if (TryGetIndicatorPositionScreenFactor(delta, out indicator.positionScreenFactor))
+			if(this._gameplay.gameBoard.players.localPlayer.character != null)
 			{
-				indicator.kind = enemy switch
-				{
-					IStrider => HudIndicatorKind.BigEnemy,
-					_ => HudIndicatorKind.SmallEnemy,
-				};
-				
-				return true;
-			}
+				float2 localPlayerPosition = this._gameplay.gameBoard.players.localPlayer.character.position.xz;
+				float2 enemyPosition = enemy.position.xz;
+				float2 delta = enemyPosition - localPlayerPosition;
 
+				if (TryGetIndicatorPositionScreenFactor(delta, out indicator.positionScreenFactor))
+				{
+					indicator.kind = enemy switch
+					{
+						IStrider => HudIndicatorKind.BigEnemy,
+						_ => HudIndicatorKind.SmallEnemy,
+					};
+
+					return true;
+				}
+			}
+			
 			return false;
 		}
 
