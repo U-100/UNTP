@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace UNTP
 {
@@ -54,23 +55,29 @@ namespace UNTP
 
 		public override void OnNetworkSpawn()
 		{
-			this.NetworkManager.AddNetworkPrefabHandler(
-				this._walkerPrefab.gameObject,
-				(_, position, rotation) => this._walkerFactory(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
+			if (!IsServer)
+			{
+				this.NetworkManager.AddNetworkPrefabHandler(
+					this._walkerPrefab.gameObject,
+					(_, position, rotation) => this._walkerFactory(position, rotation).NetworkObject,
+					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+				);
 
-			this.NetworkManager.AddNetworkPrefabHandler(
-				this._striderPrefab.gameObject,
-				(_, position, rotation) => this._striderFactory(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
+				this.NetworkManager.AddNetworkPrefabHandler(
+					this._striderPrefab.gameObject,
+					(_, position, rotation) => this._striderFactory(position, rotation).NetworkObject,
+					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+				);
+			}
 		}
 
 		public override void OnNetworkDespawn()
 		{
-			this.NetworkManager.RemoveNetworkPrefabHandler(this._walkerPrefab.gameObject);
-			this.NetworkManager.RemoveNetworkPrefabHandler(this._striderPrefab.gameObject);
+			if (!IsServer)
+			{
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._walkerPrefab.gameObject);
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._striderPrefab.gameObject);
+			}
 		}
 	}
 }

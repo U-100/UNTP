@@ -78,10 +78,6 @@ namespace UNTP
 				Debug.LogException(ex);
 				throw;
 			}
-			finally
-			{
-				Debug.Log("Exiting HostGameplay.Start()");
-			}
 		}
 
 		public void Play()

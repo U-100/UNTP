@@ -52,16 +52,18 @@ namespace UNTP
 
 		public override void OnNetworkSpawn()
 		{
-			this.NetworkManager.AddNetworkPrefabHandler(
-				this._playerCharacterPrefab.gameObject,
-				(_, position, rotation) => this._playerCharacterFactory(position, rotation).NetworkObject,
-				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
-			);
+			if(!IsServer)
+				this.NetworkManager.AddNetworkPrefabHandler(
+					this._playerCharacterPrefab.gameObject,
+					(_, position, rotation) => this._playerCharacterFactory(position, rotation).NetworkObject,
+					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+				);
 		}
 
 		public override void OnNetworkDespawn()
 		{
-			this.NetworkManager.RemoveNetworkPrefabHandler(this._playerCharacterPrefab.gameObject);
+			if(!IsServer)
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._playerCharacterPrefab.gameObject);
 		}
 	}
 }
