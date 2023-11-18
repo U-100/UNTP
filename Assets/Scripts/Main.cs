@@ -50,8 +50,8 @@ namespace UNTP
 					gameplayScope.networkDiscovery,
 					gameplayScope.networkManager,
 					gameplayScope.connectionPort,
-					gameplayScope.gameLogic,
-					gameplayScope.CreateNetworkGameBoard
+					gameplayScope.networkGameBoardFactory,
+					gameplayScope.gameLogic
 				);
 
 			return hostGameplay.AddDisposable(gameplayScope);
@@ -66,8 +66,7 @@ namespace UNTP
 					gameplayScope.networkDiscovery,
 					gameplayScope.networkManager,
 					gameplayScope.connectionPort,
-					gameplayScope.gameSettings.networkGameBoardPrefab,
-					gameplayScope.CreateNetworkGameBoard,
+					gameplayScope.networkGameBoardFactory,
 					gameplayScope.gameLogic
 				);
 

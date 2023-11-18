@@ -1,29 +1,21 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace UNTP
 {
 	public class NetworkEnemyRepository : NetworkBehaviour, IEnemyRepository
 	{
-		private NetworkWalker _walkerPrefab;
-		public delegate NetworkWalker WalkerFactory(float3 position, quaternion rotation);
-		private WalkerFactory _walkerFactory;
+		private INetworkPrefabFactory<NetworkWalker> _walkerFactory;
 
-		private NetworkStrider _striderPrefab;
-		public delegate NetworkStrider StriderFactory(float3 position, quaternion rotation);
-		private StriderFactory _striderFactory;
+		private INetworkPrefabFactory<NetworkStrider> _striderFactory;
 
 		private readonly List<NetworkEnemy> _enemies = new();
 
-		public NetworkEnemyRepository Init(NetworkWalker walkerPrefab, WalkerFactory walkerFactory, NetworkStrider striderPrefab, StriderFactory striderFactory)
+		public void Init(INetworkPrefabFactory<NetworkWalker> walkerFactory, INetworkPrefabFactory<NetworkStrider> striderFactory)
 		{
-			this._walkerPrefab = walkerPrefab;
 			this._walkerFactory = walkerFactory;
-			this._striderPrefab = striderPrefab;
 			this._striderFactory = striderFactory;
-			return this;
 		}
 
 		public int count => this._enemies.Count;
@@ -32,7 +24,7 @@ namespace UNTP
 
 		public IWalker CreateWalker(float3 position)
 		{
-			NetworkWalker walker = this._walkerFactory(position, quaternion.identity);
+			NetworkWalker walker = this._walkerFactory.Create(this.NetworkManager.LocalClientId, position, quaternion.identity);
 			walker.NetworkObject.Spawn();
 			this._enemies.Add(walker);
 			return walker;
@@ -40,7 +32,7 @@ namespace UNTP
 
 		public IStrider CreateStrider(float3 position)
 		{
-			NetworkStrider strider = this._striderFactory(position, quaternion.identity);
+			NetworkStrider strider = this._striderFactory.Create(this.NetworkManager.LocalClientId, position, quaternion.identity);
 			strider.NetworkObject.Spawn();
 			this._enemies.Add(strider);
 			return strider;
@@ -58,15 +50,15 @@ namespace UNTP
 			if (!IsServer)
 			{
 				this.NetworkManager.AddNetworkPrefabHandler(
-					this._walkerPrefab.gameObject,
-					(_, position, rotation) => this._walkerFactory(position, rotation).NetworkObject,
-					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+					this._walkerFactory.prefab.gameObject,
+					(ownerClientId, position, rotation) => this._walkerFactory.Create(ownerClientId, position, rotation).NetworkObject,
+					networkObject => Destroy(networkObject.gameObject)
 				);
 
 				this.NetworkManager.AddNetworkPrefabHandler(
-					this._striderPrefab.gameObject,
-					(_, position, rotation) => this._striderFactory(position, rotation).NetworkObject,
-					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+					this._striderFactory.prefab.gameObject,
+					(ownerClientId, position, rotation) => this._striderFactory.Create(ownerClientId, position, rotation).NetworkObject,
+					networkObject => Destroy(networkObject.gameObject)
 				);
 			}
 		}
@@ -75,8 +67,8 @@ namespace UNTP
 		{
 			if (!IsServer)
 			{
-				this.NetworkManager.RemoveNetworkPrefabHandler(this._walkerPrefab.gameObject);
-				this.NetworkManager.RemoveNetworkPrefabHandler(this._striderPrefab.gameObject);
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._walkerFactory.prefab.gameObject);
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._striderFactory.prefab.gameObject);
 			}
 		}
 	}

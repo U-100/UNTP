@@ -14,29 +14,28 @@ namespace UNTP
 		private readonly NetworkDiscovery _networkDiscovery;
 		private readonly NetworkManager _networkManager;
 		private readonly ushort _connectionPort;
-		private readonly NetworkGameBoard _networkGameBoardPrefab;
+		private readonly INetworkPrefabFactory<NetworkGameBoard> _gameBoardFactory;
 		private readonly IGameLogic _gameLogic;
 
 		private readonly List<IDisposable> _disposables = new();
 
 		private CancellationTokenSource _searchForServersCts;
-		private NetworkGameBoard _networkGameBoard;
+		private NetworkGameBoard _gameBoard;
 
-		public delegate NetworkGameBoard NetworkGameBoardFactory();
-		public ClientGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, NetworkGameBoard networkGameBoardPrefab, NetworkGameBoardFactory networkGameBoardFactory, IGameLogic gameLogic)
+		public ClientGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, INetworkPrefabFactory<NetworkGameBoard> gameBoardFactory, IGameLogic gameLogic)
 		{
 			this._networkDiscovery = networkDiscovery;
 			this._networkManager = networkManager;
 			this._connectionPort = connectionPort;
-			this._networkGameBoardPrefab = networkGameBoardPrefab;
+			this._gameBoardFactory = gameBoardFactory;
 			this._gameLogic = gameLogic;
 
 			this._networkManager.OnClientStarted += this.OnClientStarted;
 			this._networkManager.OnClientStopped += this.OnClientStopped;
 			
 			this._networkManager.AddNetworkPrefabHandler(
-				this._networkGameBoardPrefab.gameObject,
-				(_, _, _) => networkGameBoardFactory().NetworkObject,
+				this._gameBoardFactory.prefab.gameObject,
+				(ownerClientId, position, rotation) => this._gameBoardFactory.Create(ownerClientId, position, rotation).NetworkObject,
 				networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
 			);
 		}
@@ -46,7 +45,7 @@ namespace UNTP
 			this._networkManager.OnClientStarted -= this.OnClientStarted;
 			this._networkManager.OnClientStopped -= this.OnClientStopped;
 
-			this._networkManager.RemoveNetworkPrefabHandler(this._networkGameBoardPrefab.gameObject);
+			this._networkManager.RemoveNetworkPrefabHandler(this._gameBoardFactory.prefab.gameObject);
 
 			foreach (IDisposable disposable in this._disposables)
 				disposable.Dispose();
@@ -58,7 +57,7 @@ namespace UNTP
 			return this;
 		}
 
-		public IGameBoard gameBoard => this._networkGameBoard ??= this._networkManager.LocalClient.PlayerObject?.GetComponent<NetworkPlayer>().networkGameBoard;
+		public IGameBoard gameBoard => this._gameBoard ??= this._networkManager.LocalClient.PlayerObject != null ? this._networkManager.LocalClient.PlayerObject.GetComponent<NetworkPlayer>().networkGameBoard : null;
 
 		public async Task Start()
 		{
@@ -127,7 +126,7 @@ namespace UNTP
 		{
 			Debug.Log("Client stopped");
 
-			this._networkGameBoard = null;
+			this._gameBoard = null;
 		}
 	}
 }

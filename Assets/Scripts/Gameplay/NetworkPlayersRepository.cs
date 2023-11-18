@@ -6,18 +6,11 @@ namespace UNTP
 {
 	public class NetworkPlayersRepository : NetworkBehaviour, IPlayersRepository
 	{
-		private NetworkPlayerCharacter _playerCharacterPrefab;
-		public delegate NetworkPlayerCharacter NetworkPlayerCharacterFactory(float3 position, quaternion rotation);
-		private NetworkPlayerCharacterFactory _playerCharacterFactory;
+		private INetworkPrefabFactory<NetworkPlayerCharacter> _playerCharacterFactory;
 
 		private readonly List<NetworkPlayer> _networkPlayers = new();
 		
-		public NetworkPlayersRepository Init(NetworkPlayerCharacter playerCharacterPrefab, NetworkPlayerCharacterFactory playerCharacterFactory)
-		{
-			this._playerCharacterPrefab = playerCharacterPrefab;
-			this._playerCharacterFactory = playerCharacterFactory;
-			return this;
-		}
+		public void Init(INetworkPrefabFactory<NetworkPlayerCharacter> playerCharacterFactory) => this._playerCharacterFactory = playerCharacterFactory;
 
 		public int count => this._networkPlayers.Count;
 
@@ -28,7 +21,7 @@ namespace UNTP
 		public void CreateCharacterForPlayerAtIndex(int playerIndex, float3 position, quaternion rotation)
 		{
 			NetworkPlayer networkPlayer = this._networkPlayers[playerIndex];
-			NetworkPlayerCharacter networkPlayerCharacter = this._playerCharacterFactory(position, rotation);
+			NetworkPlayerCharacter networkPlayerCharacter = this._playerCharacterFactory.Create(networkPlayer.OwnerClientId, position, rotation);
 			networkPlayerCharacter.NetworkObject.SpawnWithOwnership(networkPlayer.OwnerClientId);
 			networkPlayer.SetNetworkPlayerCharacter(networkPlayerCharacter);
 		}
@@ -54,16 +47,16 @@ namespace UNTP
 		{
 			if(!IsServer)
 				this.NetworkManager.AddNetworkPrefabHandler(
-					this._playerCharacterPrefab.gameObject,
-					(_, position, rotation) => this._playerCharacterFactory(position, rotation).NetworkObject,
-					networkObject => UnityEngine.Object.Destroy(networkObject.gameObject)
+					this._playerCharacterFactory.prefab.gameObject,
+					(ownerClientId, position, rotation) => this._playerCharacterFactory.Create(ownerClientId, position, rotation).NetworkObject,
+					networkObject => Destroy(networkObject.gameObject)
 				);
 		}
 
 		public override void OnNetworkDespawn()
 		{
 			if(!IsServer)
-				this.NetworkManager.RemoveNetworkPrefabHandler(this._playerCharacterPrefab.gameObject);
+				this.NetworkManager.RemoveNetworkPrefabHandler(this._playerCharacterFactory.prefab.gameObject);
 		}
 	}
 }

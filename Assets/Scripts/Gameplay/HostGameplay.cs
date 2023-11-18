@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -15,21 +16,20 @@ namespace UNTP
 		private readonly ushort _connectionPort;
 		private readonly IGameLogic _gameLogic;
 
-		public delegate NetworkGameBoard NetworkGameBoardFactory();
-		private readonly NetworkGameBoardFactory _networkGameBoardFactory;
+		private readonly INetworkPrefabFactory<NetworkGameBoard> _gameBoardFactory;
 
 		private readonly List<IDisposable> _disposables = new();
 
 		private CancellationTokenSource _serverAdvertisementCts;
 		private NetworkGameBoard _networkGameBoard;
 
-		public HostGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, IGameLogic gameLogic, NetworkGameBoardFactory networkGameBoardFactory)
+		public HostGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, INetworkPrefabFactory<NetworkGameBoard> gameBoardFactory, IGameLogic gameLogic)
 		{
 			this._networkDiscovery = networkDiscovery;
 			this._networkManager = networkManager;
 			this._connectionPort = connectionPort;
+			this._gameBoardFactory = gameBoardFactory;
 			this._gameLogic = gameLogic;
-			this._networkGameBoardFactory = networkGameBoardFactory;
 
 			this._networkManager.OnServerStarted += this.OnServerStarted;
 			this._networkManager.OnServerStopped += this.OnServerStopped;
@@ -120,7 +120,7 @@ namespace UNTP
 		{
 			Debug.Log("Server started");
 
-			this._networkGameBoard = this._networkGameBoardFactory();
+			this._networkGameBoard = this._gameBoardFactory.Create(this._networkManager.LocalClientId, float3.zero, quaternion.identity);
 			this._networkGameBoard.NetworkObject.Spawn();
 		}
 

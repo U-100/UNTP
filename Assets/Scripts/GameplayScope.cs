@@ -51,15 +51,17 @@ namespace UNTP
 			return disposable;
 		}
 
-		public NetworkGameBoard CreateNetworkGameBoard()
+
+		private NetworkPrefabInstanceFactory<NetworkGameBoard> _networkGameBoardFactory;
+		public NetworkPrefabInstanceFactory<NetworkGameBoard> networkGameBoardFactory => this._networkGameBoardFactory ?? new NetworkPrefabInstanceFactory<NetworkGameBoard>(this.gameSettings.networkGameBoardPrefab, this.InitNetworkGameBoard);
+
+		public void InitNetworkGameBoard(NetworkGameBoard networkGameBoard, ulong ownerClientId, float3 position, quaternion rotation)
 		{
-			GameObject gameObject = UnityEngine.Object.Instantiate(this.gameSettings.networkGameBoardPrefab.gameObject);
+			GameObject gameObject = networkGameBoard.gameObject;
 
 			gameObject.GetComponent<NetworkWorldMap>().Init(this.worldGen, this.gameSettings.chunkSize, this.CreateVisualChunk, this.CreatePhysicalChunk);
-			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.gameSettings.networkPlayerCharacterPrefab, this.CreateNetworkPlayerCharacter);
-			gameObject.GetComponent<NetworkEnemyRepository>().Init(this.gameSettings.networkWalkerPrefab, this.CreateNetworkWalker, this.gameSettings.networkStriderPrefab, this.CreateNetworkStrider);
-
-			return gameObject.GetComponent<NetworkGameBoard>();
+			gameObject.GetComponent<NetworkPlayersRepository>().Init(this.networkPlayerCharacterFactory);
+			gameObject.GetComponent<NetworkEnemyRepository>().Init(this.networkWalkerFactory, this.networkStriderFactory);
 		}
 
 		public GameSettings gameSettings { get; }
@@ -90,13 +92,17 @@ namespace UNTP
 		private WorldGen _worldGen;
 		public IWorldGen worldGen => this._worldGen ??= new WorldGen(this.gameSettings.worldSettings);
 
-		NetworkPlayerCharacter CreateNetworkPlayerCharacter(float3 position, quaternion rotation) => UnityEngine.Object.Instantiate(this.gameSettings.networkPlayerCharacterPrefab, position, rotation);
+		private NetworkPrefabInstanceFactory<NetworkPlayerCharacter> _networkPlayerCharacterFactory;
+		public NetworkPrefabInstanceFactory<NetworkPlayerCharacter> networkPlayerCharacterFactory => this._networkPlayerCharacterFactory ?? new NetworkPrefabInstanceFactory<NetworkPlayerCharacter>(this.gameSettings.networkPlayerCharacterPrefab);
+
+		private NetworkPrefabInstanceFactory<NetworkWalker> _networkWalkerFactory;
+		public NetworkPrefabInstanceFactory<NetworkWalker> networkWalkerFactory => this._networkWalkerFactory ?? new NetworkPrefabInstanceFactory<NetworkWalker>(this.gameSettings.networkWalkerPrefab);
+
+		private NetworkPrefabInstanceFactory<NetworkStrider> _networkStriderFactory;
+		public NetworkPrefabInstanceFactory<NetworkStrider> networkStriderFactory => this._networkStriderFactory ?? new NetworkPrefabInstanceFactory<NetworkStrider>(this.gameSettings.networkStriderPrefab);
 
 		VisualChunk CreateVisualChunk(Vector3 position) => UnityEngine.Object.Instantiate(this.gameSettings.visualChunkPrefab, position, Quaternion.identity);
 		
 		PhysicalChunk CreatePhysicalChunk(Vector3 position) => UnityEngine.Object.Instantiate(this.gameSettings.physicalChunkPrefab, position, Quaternion.identity);
-
-		NetworkWalker CreateNetworkWalker(float3 position, quaternion rotation) => UnityEngine.Object.Instantiate(this.gameSettings.networkWalkerPrefab, position, rotation);
-		NetworkStrider CreateNetworkStrider(float3 position, quaternion rotation) => UnityEngine.Object.Instantiate(this.gameSettings.networkStriderPrefab, position, rotation);
 	}
 }
