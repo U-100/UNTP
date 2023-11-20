@@ -81,9 +81,29 @@ namespace UNTP
 
 	public interface IPlayer
 	{
+		IPlayerCamera playerCamera { get; }
 		IPlayerCharacter character { get; }
 		ConstructionState constructionState { get; set; }
 		IBlueprint blueprint { get; }
+	}
+
+	public interface IPlayerCamera
+	{
+		float3 position { get; }
+		quaternion rotation { get; }
+		float3 forward { get; }
+		float3 up { get; }
+		float3 right { get; }
+		
+		float fov { get; }
+		float aspect { get; }
+	}
+	
+	public interface IPlayerCharacter
+	{
+		float3 position { get; set; }
+		quaternion rotation { get; set; }
+		float3 forward { get; set; }
 	}
 
 	public enum ConstructionState
@@ -91,13 +111,6 @@ namespace UNTP
 		NoConstruction,
 		ConstructionRestricted,
 		ConstructionAllowed,
-	}
-
-	public interface IPlayerCharacter
-	{
-		float3 position { get; set; }
-		quaternion rotation { get; set; }
-		float3 forward { get; set; }
 	}
 
 	public interface IBlueprint

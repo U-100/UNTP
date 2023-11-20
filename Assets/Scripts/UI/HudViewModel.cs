@@ -67,17 +67,10 @@ namespace UNTP
 		{
 			indicator = new HudIndicatorData();
 
-			if(player.character != null)
+			if(player.character != null && TryGetIndicatorPositionScreenFactor(player.character.position, out indicator.positionScreenFactor))
 			{
-				float2 localPlayerPosition = this._gameplay.gameBoard.players.localPlayer.character.position.xz;
-				float2 otherPlayerPosition = player.character.position.xz;
-				float2 delta = otherPlayerPosition - localPlayerPosition;
-
-				if (TryGetIndicatorPositionScreenFactor(delta, out indicator.positionScreenFactor))
-				{
-					indicator.kind = HudIndicatorKind.Ally;
-					return true;
-				}
+				indicator.kind = HudIndicatorKind.Ally;
+				return true;
 			}
 
 			return false;
@@ -87,45 +80,40 @@ namespace UNTP
 		{
 			indicator = new HudIndicatorData();
 
-			if(this._gameplay.gameBoard.players.localPlayer.character != null)
+			if (TryGetIndicatorPositionScreenFactor(enemy.position, out indicator.positionScreenFactor))
 			{
-				float2 localPlayerPosition = this._gameplay.gameBoard.players.localPlayer.character.position.xz;
-				float2 enemyPosition = enemy.position.xz;
-				float2 delta = enemyPosition - localPlayerPosition;
-
-				if (TryGetIndicatorPositionScreenFactor(delta, out indicator.positionScreenFactor))
+				indicator.kind = enemy switch
 				{
-					indicator.kind = enemy switch
-					{
-						IStrider => HudIndicatorKind.BigEnemy,
-						_ => HudIndicatorKind.SmallEnemy,
-					};
+					IStrider => HudIndicatorKind.BigEnemy,
+					_ => HudIndicatorKind.SmallEnemy,
+				};
 
-					return true;
-				}
+				return true;
 			}
 			
 			return false;
 		}
 
-		private bool TryGetIndicatorPositionScreenFactor(float2 delta, out float2 positionScreenFactor)
+		private bool TryGetIndicatorPositionScreenFactor(float3 targetPosition, out float2 positionScreenFactor)
 		{
-			const int OUT_OF_SIGHT_DISTANCE = 5;
-			if (any(abs(delta) > OUT_OF_SIGHT_DISTANCE))
+			IPlayerCamera playerCamera = this._gameplay.gameBoard.players.localPlayer.playerCamera;
+			if(playerCamera != null)
 			{
-				if (abs(delta.x) > abs(delta.y))
+				float3 cameraPosition = playerCamera.position;
+				float3 directionToTarget = normalize(targetPosition - cameraPosition);
+				float dotx = dot(directionToTarget, playerCamera.right);
+				float doty = dot(directionToTarget, playerCamera.up);
+				float2 p = new float2(dotx / sqrt(1 - dotx * dotx), doty / sqrt(1 - doty * doty));
+				float2 hr = new float2(playerCamera.aspect * tan(radians(playerCamera.fov / 2)), tan(radians(playerCamera.fov / 2)));
+				if (any(abs(p) > abs(hr)))
 				{
-					positionScreenFactor.x = delta.x < 0 ? 0 : 1;
-					positionScreenFactor.y = clamp(.5f - delta.y / OUT_OF_SIGHT_DISTANCE * .5f, 0, 1);
+					p = clamp(p, -hr, hr);
+					positionScreenFactor = p / (2 * hr) + 0.5f;
+					positionScreenFactor.y = 1 - positionScreenFactor.y;
+					return true;
 				}
-				else
-				{
-					positionScreenFactor.x = clamp(.5f + delta.x / OUT_OF_SIGHT_DISTANCE * .5f, 0, 1);
-					positionScreenFactor.y = delta.y > 0 ? 0 : 1;
-				}
-				return true;
 			}
-
+			
 			positionScreenFactor = default;
 			return false;
 		}

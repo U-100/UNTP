@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace UNTP
 	// simple player character object whose position/rotation are synced over the network
 	public class NetworkPlayerCharacter : NetworkBehaviour, IPlayerCharacter
 	{
-		[SerializeField] private GameObject[] _activateWhenOwner;
+		[SerializeField] private CinemachineCamera _playerCamera;
 
 		public float3 position
 		{
@@ -27,10 +28,11 @@ namespace UNTP
 			set => this.transform.forward = value;
 		}
 
+		public CinemachineCamera playerCamera => this._playerCamera;
+		
 		public override void OnNetworkSpawn()
 		{
-			foreach (GameObject gameObjectToActivate in this._activateWhenOwner)
-				gameObjectToActivate.SetActive(this.IsClient && this.IsOwner);
+			this._playerCamera.gameObject.SetActive(this.IsClient && this.IsOwner);
 		}
 	}
 }
