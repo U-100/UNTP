@@ -104,6 +104,8 @@ namespace UNTP
 		float3 position { get; set; }
 		quaternion rotation { get; set; }
 		float3 forward { get; set; }
+		
+		void Shoot(float3 from, float3 direction);
 	}
 
 	public enum ConstructionState

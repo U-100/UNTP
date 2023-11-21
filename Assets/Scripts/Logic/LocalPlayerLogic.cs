@@ -1,6 +1,8 @@
 using Ugol.BehaviourTree;
 using Unity.Mathematics;
 
+using static Unity.Mathematics.math;
+
 namespace UNTP
 {
 	public class LocalPlayerLogic
@@ -21,6 +23,7 @@ namespace UNTP
 			&& UpdateChunksNearPlayer(board)
 			&& (
 				Move(board, deltaTime)
+				+ Shoot(board, deltaTime)
 				+ Construct(board, deltaTime)
 			);
 
@@ -36,6 +39,47 @@ namespace UNTP
 			board.worldMap.MaterializeVisualRange(localPlayerCharacter.position - this._playerSettings.visionSize, localPlayerCharacter.position + this._playerSettings.visionSize);
 
 			return Status.COMPLETE;
+		}
+
+		private Status Move(IGameBoard board, float deltaTime)
+		{
+			// move and rotate this.client's NetworkPlayerCharacter
+			float2 moveInput = this._gameInputSource.input.move;
+			float3 velocity = float3(moveInput.x, 0, moveInput.y) * this._playerSettings.speed;
+			float3 movement = velocity * deltaTime;
+
+			IPlayer localPlayer = board.players.localPlayer;
+
+			MoveSphericalCharacterResult moveSphericalCharacterResult =
+				CharacterMovementLogic.MoveSphericalCharacter(
+					this._gamePhysics,
+					localPlayer.character.position,
+					localPlayer.character.rotation,
+					this._playerSettings.radius,
+					movement,
+					this._playerSettings.stepHeight,
+					deltaTime,
+					CharacterMovementLogic.DEFAULT_SKIN_WIDTH,
+					CharacterMovementLogic.DEFAULT_MOVE_ITERATIONS
+				);
+
+			localPlayer.character.position = moveSphericalCharacterResult.position;
+			localPlayer.character.rotation = moveSphericalCharacterResult.rotation;
+
+			return Status.RUNNING;
+		}
+
+		private Status Shoot(IGameBoard board, float deltaTime)
+		{
+			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
+			
+			float2 aimInput = this._gameInputSource.input.aim;
+			float3 aimDirection = /*length(aimInput) > 0 ? normalize(float3(aimInput.x, 0, aimInput.y)) : */localPlayerCharacter.forward;
+
+			if(this._gameInputSource.input.shoot)
+				localPlayerCharacter.Shoot(localPlayerCharacter.position, aimDirection);
+			
+			return Status.RUNNING;
 		}
 
 		private Status Construct(IGameBoard board, float deltaTime) => StartConstruction(board) && ApplyConstructionState(board, deltaTime) && FinishConstruction(board);
@@ -60,15 +104,15 @@ namespace UNTP
 			float3 newBlueprintPos = BlueprintCellPos(localPlayer.character);
 			float3 oldBlueprintPos = localPlayer.blueprint.position;
 
-			float fullDistance = math.length(newBlueprintPos - oldBlueprintPos);
+			float fullDistance = length(newBlueprintPos - oldBlueprintPos);
 			float maxDistance = this._playerSettings.speed * 4.0f * deltaTime;
-			float distance = math.min(fullDistance, maxDistance);
+			float distance = min(fullDistance, maxDistance);
 
-			float3 interpolatedBlueprintPos = fullDistance > 0 ? math.lerp(oldBlueprintPos, newBlueprintPos, distance / fullDistance) : newBlueprintPos;
+			float3 interpolatedBlueprintPos = fullDistance > 0 ? lerp(oldBlueprintPos, newBlueprintPos, distance / fullDistance) : newBlueprintPos;
 
 			localPlayer.blueprint.position = interpolatedBlueprintPos;
 
-			if (this._gamePhysics.CheckBox(newBlueprintPos + math.float3(0.5f), math.float3(0.45f)))
+			if (this._gamePhysics.CheckBox(newBlueprintPos + float3(0.5f), float3(0.45f)))
 			{
 				localPlayer.blueprint.active = false;
 				localPlayer.constructionState = ConstructionState.ConstructionRestricted;
@@ -106,6 +150,8 @@ namespace UNTP
 			return Status.RUNNING;
 		}
 
+		private float3 BlueprintCellPos(IPlayerCharacter playerCharacter) => floor(playerCharacter.position + playerCharacter.forward * (this._playerSettings.radius + 1.0f));
+
 		private Status CancelConstruction(IGameBoard board)
 		{
 			if (this._gameInputSource.input.cancelConstructionPlacement)
@@ -118,35 +164,5 @@ namespace UNTP
 
 			return Status.RUNNING;
 		}
-
-		private Status Move(IGameBoard board, float deltaTime)
-		{
-			// move and rotate this.client's NetworkPlayerCharacter
-			float2 moveInput = this._gameInputSource.input.move;
-			float3 velocity = math.float3(moveInput.x, 0, moveInput.y) * this._playerSettings.speed;
-			float3 movement = velocity * deltaTime;
-
-			IPlayer localPlayer = board.players.localPlayer;
-
-			MoveSphericalCharacterResult moveSphericalCharacterResult =
-				CharacterMovementLogic.MoveSphericalCharacter(
-					this._gamePhysics,
-					localPlayer.character.position,
-					localPlayer.character.rotation,
-					this._playerSettings.radius,
-					movement,
-					this._playerSettings.stepHeight,
-					deltaTime,
-					CharacterMovementLogic.DEFAULT_SKIN_WIDTH,
-					CharacterMovementLogic.DEFAULT_MOVE_ITERATIONS
-				);
-
-			localPlayer.character.position = moveSphericalCharacterResult.position;
-			localPlayer.character.rotation = moveSphericalCharacterResult.rotation;
-
-			return Status.RUNNING;
-		}
-
-		private float3 BlueprintCellPos(IPlayerCharacter playerCharacter) => math.floor(playerCharacter.position + playerCharacter.forward * (this._playerSettings.radius + 1.0f));
 	}
 }

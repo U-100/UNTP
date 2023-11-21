@@ -7,6 +7,8 @@ namespace UNTP
 	public struct GameInput
 	{
 		public float2 move;
+		public float2 aim;
+		public bool shoot;
 		public bool startConstructionPlacement;
 		public bool confirmConstructionPlacement;
 		public bool cancelConstructionPlacement;
@@ -31,6 +33,8 @@ namespace UNTP
 			new GameInput
 			{
 				move = this._playerInputActions.Player.Move.ReadValue<Vector2>(),
+				aim = this._playerInputActions.Player.Aim.ReadValue<Vector2>(),
+				shoot = this._playerInputActions.Player.Shoot.WasPerformedThisFrame(),
 				startConstructionPlacement = this._playerInputActions.Player.StartConstructionPlacement.WasPerformedThisFrame(),
 				confirmConstructionPlacement = this._playerInputActions.Player.ConfirmConstructionPlacement.WasPerformedThisFrame(),
 				cancelConstructionPlacement = this._playerInputActions.Player.CancelConstructionPlacement.WasPerformedThisFrame(),

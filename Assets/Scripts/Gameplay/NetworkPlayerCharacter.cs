@@ -9,6 +9,7 @@ namespace UNTP
 	public class NetworkPlayerCharacter : NetworkBehaviour, IPlayerCharacter
 	{
 		[SerializeField] private CinemachineCamera _playerCamera;
+		[SerializeField] private GameObject _shotEffect; 
 
 		public float3 position
 		{
@@ -28,6 +29,12 @@ namespace UNTP
 			set => this.transform.forward = value;
 		}
 
+		public void Shoot(float3 from, float3 direction)
+		{
+			GameObject shotEffect = Instantiate(this._shotEffect, from, quaternion.LookRotationSafe(direction, Vector3.up));
+			Destroy(shotEffect, 1.0f);
+		}
+		
 		public CinemachineCamera playerCamera => this._playerCamera;
 		
 		public override void OnNetworkSpawn()
