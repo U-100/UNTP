@@ -20,6 +20,21 @@ namespace UNTP
             writer.WriteValueSafe(i3.z);
         }
         
+        public static void ReadValueSafe(this FastBufferReader reader, out float3 f3)
+        {
+            reader.ReadValueSafe(out float x);
+            reader.ReadValueSafe(out float y);
+            reader.ReadValueSafe(out float z);
+            f3 = math.float3(x, y, z);
+        }
+
+        public static void WriteValueSafe(this FastBufferWriter writer, in float3 f3)
+        {
+            writer.WriteValueSafe(f3.x);
+            writer.WriteValueSafe(f3.y);
+            writer.WriteValueSafe(f3.z);
+        }
+        
         public static void ReadValueSafe(this FastBufferReader reader, out WorldMapCell worldMapCell)
         {
             reader.ReadValueSafe(out worldMapCell.mask);

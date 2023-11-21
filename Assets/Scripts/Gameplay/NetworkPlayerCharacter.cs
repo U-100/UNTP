@@ -29,7 +29,13 @@ namespace UNTP
 			set => this.transform.forward = value;
 		}
 
-		public void Shoot(float3 from, float3 direction)
+		public void Shoot(float3 from, float3 direction) => ShootServerRpc(from, direction);
+
+		[ServerRpc]
+		private void ShootServerRpc(float3 from, float3 direction) => ShootClientRpc(from, direction);
+
+		[ClientRpc]
+		private void ShootClientRpc(float3 from, float3 direction)
 		{
 			GameObject shotEffect = Instantiate(this._shotEffect, from, quaternion.LookRotationSafe(direction, Vector3.up));
 			Destroy(shotEffect, 1.0f);
