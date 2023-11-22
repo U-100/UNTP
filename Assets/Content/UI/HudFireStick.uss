@@ -1,0 +1,18 @@
+.hud-fire-stick {
+    width: 200px;
+    height: 200px;
+    background-image: url('project://database/Assets/Content/UI/Icons/crosshair.svg?fileID=7388822144124034973&guid=d0817b979527f864c8a6bacf4a7f731b&type=3#crosshair');
+}
+
+.hud-fire-stick--active {
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0.25);
+}
+
+.hud-fire-stick__knob {
+    width: 160px;
+    height: 160px;
+    position: absolute;
+    left: -80px;
+    top: -80px;
+    background-image: url('project://database/Assets/Content/UI/Icons/crosshair.svg?fileID=7388822144124034973&guid=d0817b979527f864c8a6bacf4a7f731b&type=3#crosshair');
+}

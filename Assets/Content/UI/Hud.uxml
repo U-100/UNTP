@@ -1,5 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Content/UI/UI.uss?fileID=7433441132597879392&amp;guid=425856cfda862794cbea8cf7630fb547&amp;type=3#UI" />
+    <Style src="project://database/Assets/Content/UI/HudIndicator.uss?fileID=7433441132597879392&amp;guid=98021f9cae570e24fa6327149e83a208&amp;type=3#HudIndicator" />
+    <Style src="project://database/Assets/Content/UI/HudFireStick.uss?fileID=7433441132597879392&amp;guid=f77991070d4ca074aa497426d9e6bc9d&amp;type=3#HudFireStick" />
     <ui:VisualElement name="HudIndicatorsArea" style="flex-grow: 1; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;" />
     <ui:VisualElement name="HudLeftStickTouchArea" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center;">
         <ui:Button name="HudPauseButton" style="position: absolute; top: 20px; left: 20px; right: auto; bottom: auto; width: 70px; height: 100px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; background-color: rgb(255, 255, 255); border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-left-width: 10px; border-right-width: 10px; border-top-width: 10px; border-bottom-width: 10px;">
@@ -12,9 +14,12 @@
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; position: absolute; top: -100px; left: -100px; right: auto; bottom: auto; width: 200px; height: 200px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-left-radius: 50%; border-bottom-left-radius: 50%; border-top-right-radius: 50%; border-bottom-right-radius: 50%; border-left-width: 10px; border-right-width: 10px; border-top-width: 10px; border-bottom-width: 10px;" />
         </ui:VisualElement>
-        <ui:Button name="HudStartConstructionPlacementButton" text="B" class="hud-button-small" style="position: absolute; right: 300px; bottom: 100px;" />
-        <ui:Button name="HudConfirmConstructionPlacementButton" text="X" class="hud-button-small" style="position: absolute; top: auto; left: auto; right: 250px; bottom: 250px;" />
-        <ui:Button name="HudCancelConstructionPlacementButton" text="O" class="hud-button-small" style="position: absolute; bottom: 300px; right: 100px;" />
-        <ui:Button name="HudShootButton" text="O" class="hud-button-large" style="position: absolute; bottom: 50px; right: 50px;" />
+        <ui:Button name="HudStartConstructionPlacementButton" class="hud-button-small" style="position: absolute; right: 354px; bottom: 121px; overflow: visible;">
+            <ui:VisualElement style="flex-grow: 1; background-image: url(&apos;project://database/Assets/Content/UI/Icons/trowel.svg?fileID=7388822144124034973&amp;guid=7760433c3359d9247bfe71e730e48c43&amp;type=3#trowel&apos;); position: absolute; width: 120%; height: 120%; top: -7px; left: -8px;" />
+        </ui:Button>
+        <ui:Button name="HudConfirmConstructionPlacementButton" text="X" class="hud-button-small" style="position: absolute; top: auto; left: auto; right: 377px; bottom: 237px;" />
+        <ui:Button name="HudCancelConstructionPlacementButton" text="O" class="hud-button-small" style="position: absolute; bottom: 285px; right: 261px;" />
+        <ui:Button name="HudShootButton" text="O" class="hud-button-large" style="position: absolute; bottom: 50px; right: 50px; display: none;" />
     </ui:VisualElement>
+    <UNTP.HudFireStick style="position: absolute; right: 100px; bottom: 100px;" />
 </ui:UXML>
