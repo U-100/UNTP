@@ -2,6 +2,7 @@ using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace UNTP
 {
@@ -9,7 +10,7 @@ namespace UNTP
 	public class NetworkPlayerCharacter : NetworkBehaviour, IPlayerCharacter
 	{
 		[SerializeField] private CinemachineCamera _playerCamera;
-		[SerializeField] private GameObject _shotEffect; 
+		[SerializeField] private VisualEffect _shotEffect; 
 
 		public float3 position
 		{
@@ -37,8 +38,7 @@ namespace UNTP
 		[ClientRpc]
 		private void ShootClientRpc(float3 from, float3 direction)
 		{
-			GameObject shotEffect = Instantiate(this._shotEffect, from, quaternion.LookRotationSafe(direction, Vector3.up));
-			Destroy(shotEffect, 1.0f);
+			this._shotEffect.Play();
 		}
 		
 		public CinemachineCamera playerCamera => this._playerCamera;
