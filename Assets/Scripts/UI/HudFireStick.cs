@@ -49,7 +49,7 @@ namespace UNTP
             }
         }
 
-        public float2 value => this.active ? float2(1, 1) : float2(0, 0);
+        public float2 value { get; private set; }
 
         private void OnPointerDown(PointerDownEvent evt)
         {
@@ -62,6 +62,7 @@ namespace UNTP
         {
             this.ReleasePointer(evt.pointerId);
             this.active = false;
+            this.value = 0;
         }
 
         private void OnPointerMove(PointerMoveEvent evt)
@@ -80,6 +81,8 @@ namespace UNTP
             
             this._knobParent.style.left = correctedLocalPosition.x;
             this._knobParent.style.top = correctedLocalPosition.y;
+
+            this.value = this.active && lengthsq(delta) > 0.001f ? normalize(delta) : 0;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace UNTP
 		}
 
 		public void Dispose() { }
-
+		
 		public ConstructionState constructionState => this._gameplay?.gameBoard.players.localPlayer.constructionState ?? ConstructionState.NoConstruction;
 		
 		public IReadOnlyList<HudIndicatorData> CalculateIndicators()
@@ -61,6 +61,13 @@ namespace UNTP
 				this._indicators.Clear();
 			
 			return this._indicators;
+		}
+
+		public void SetFireAim(float2 fireAim)
+		{
+			IPlayerCharacter localPlayerCharacter = this._gameplay?.gameBoard.players.localPlayer?.character;
+			if (localPlayerCharacter != null)
+				localPlayerCharacter.fireAim = new float3(fireAim.x, 0, -fireAim.y);
 		}
 
 		private bool TryGetAllyIndicator(IPlayer player, out HudIndicatorData indicator)

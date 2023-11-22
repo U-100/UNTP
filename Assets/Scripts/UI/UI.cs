@@ -52,8 +52,10 @@ namespace UNTP
 	public interface IHudViewModel : IDisposable
 	{
 		ConstructionState constructionState { get; }
-
+		
 		public IReadOnlyList<HudIndicatorData> CalculateIndicators();
+
+		void SetFireAim(float2 fireAim);
 	}
 
 	public class UI : MonoBehaviour
@@ -105,6 +107,7 @@ namespace UNTP
 		private Button _hudStartConstructionPlacementButton;
 		private Button _hudConfirmConstructionPlacementButton;
 		private Button _hudCancelConstructionPlacementButton;
+		private HudFireStick _hudFireStick;
 
 		private Gamepad _fakeGamepad;
 		
@@ -185,6 +188,8 @@ namespace UNTP
 
 			this._hudCancelConstructionPlacementButton = this._hud.Q<Button>("HudCancelConstructionPlacementButton");
 			this._hudCancelConstructionPlacementButton.clicked += this.OnHudCancelConstructionPlacement;
+
+			this._hudFireStick = this._hud.Q<HudFireStick>("HudFireStick");
 
 			this._fakeGamepad = InputSystem.AddDevice<Gamepad>();
 		}
@@ -288,6 +293,8 @@ namespace UNTP
 				this._hudStartConstructionPlacementButton.visible = this.viewModel.hud?.constructionState == ConstructionState.NoConstruction;
 				this._hudConfirmConstructionPlacementButton.visible = this.viewModel.hud?.constructionState == ConstructionState.ConstructionAllowed;
 				this._hudCancelConstructionPlacementButton.visible = this.viewModel.hud?.constructionState != ConstructionState.NoConstruction;
+
+				this.viewModel.hud?.SetFireAim(this._hudFireStick.value);
 
 				IReadOnlyList<HudIndicatorData> indicators = this.viewModel.hud?.CalculateIndicators();
 				int indicatorsCount = indicators?.Count ?? 0;

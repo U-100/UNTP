@@ -29,6 +29,8 @@ namespace UNTP
 			get => this.transform.forward;
 			set => this.transform.forward = value;
 		}
+		
+		public float3 fireAim { get; set; }
 
 		public void Shoot(float3 from, float3 direction) => ShootServerRpc(from, direction);
 
@@ -38,6 +40,7 @@ namespace UNTP
 		[ClientRpc]
 		private void ShootClientRpc(float3 from, float3 direction)
 		{
+			this._shotEffect.transform.LookAt(from + direction);
 			this._shotEffect.Play();
 		}
 		

@@ -73,11 +73,11 @@ namespace UNTP
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 			
-			float2 aimInput = this._gameInputSource.input.aim;
-			float3 aimDirection = /*length(aimInput) > 0 ? normalize(float3(aimInput.x, 0, aimInput.y)) : */localPlayerCharacter.forward;
+			//float2 aimInput = this._gameInputSource.input.aim;
+			//float3 aimDirection = /*length(aimInput) > 0 ? normalize(float3(aimInput.x, 0, aimInput.y)) : */localPlayerCharacter.forward;
 
-			if(this._gameInputSource.input.shoot)
-				localPlayerCharacter.Shoot(localPlayerCharacter.position, aimDirection);
+			if(length(localPlayerCharacter.fireAim) > 0)
+				localPlayerCharacter.Shoot(localPlayerCharacter.position, localPlayerCharacter.fireAim);
 			
 			return Status.RUNNING;
 		}

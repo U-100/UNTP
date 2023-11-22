@@ -21,5 +21,5 @@
         <ui:Button name="HudCancelConstructionPlacementButton" text="O" class="hud-button-small" style="position: absolute; bottom: 285px; right: 261px;" />
         <ui:Button name="HudShootButton" text="O" class="hud-button-large" style="position: absolute; bottom: 50px; right: 50px; display: none;" />
     </ui:VisualElement>
-    <UNTP.HudFireStick style="position: absolute; right: 100px; bottom: 100px;" />
+    <UNTP.HudFireStick name="HudFireStick" style="position: absolute; right: 100px; bottom: 100px;" />
 </ui:UXML>
