@@ -19,7 +19,7 @@ namespace UNTP
 		}
 
 		public Status Update(IGameBoard board, float deltaTime) =>
-			board.players.localPlayer.character != null
+			board.players.localPlayer.character != null // if this client's player character is present
 			&& UpdateChunksNearPlayer(board)
 			&& (
 				Move(board, deltaTime)
@@ -31,10 +31,6 @@ namespace UNTP
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 
-			if (localPlayerCharacter == null) // if this client's player character is missing
-				return Status.FAILED;
-
-			// update chunks near this client's player character
 			board.worldMap.MaterializePhysicalRange(localPlayerCharacter.position - 2, localPlayerCharacter.position + 2);
 			board.worldMap.MaterializeVisualRange(localPlayerCharacter.position - this._playerSettings.visionSize, localPlayerCharacter.position + this._playerSettings.visionSize);
 
@@ -43,7 +39,6 @@ namespace UNTP
 
 		private Status Move(IGameBoard board, float deltaTime)
 		{
-			// move and rotate this.client's NetworkPlayerCharacter
 			float2 moveInput = this._gameInputSource.input.move;
 			float3 velocity = float3(moveInput.x, 0, moveInput.y) * this._playerSettings.speed;
 			float3 movement = velocity * deltaTime;
@@ -72,12 +67,14 @@ namespace UNTP
 		private Status Shoot(IGameBoard board, float deltaTime)
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
-			
-			//float2 aimInput = this._gameInputSource.input.aim;
-			//float3 aimDirection = /*length(aimInput) > 0 ? normalize(float3(aimInput.x, 0, aimInput.y)) : */localPlayerCharacter.forward;
 
-			if(length(localPlayerCharacter.fireAim) > 0)
+			localPlayerCharacter.timeSinceLastShot += deltaTime;
+			
+			if(length(localPlayerCharacter.fireAim) > 0 && localPlayerCharacter.timeSinceLastShot > this._playerSettings.shotCooldown)
+			{
 				localPlayerCharacter.Shoot(localPlayerCharacter.position, localPlayerCharacter.fireAim);
+				localPlayerCharacter.timeSinceLastShot = 0;
+			}
 			
 			return Status.RUNNING;
 		}

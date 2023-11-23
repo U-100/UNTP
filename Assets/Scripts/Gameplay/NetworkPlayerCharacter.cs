@@ -31,6 +31,8 @@ namespace UNTP
 		}
 		
 		public float3 fireAim { get; set; }
+		
+		public float timeSinceLastShot { get; set; }
 
 		public void Shoot(float3 from, float3 direction) => ShootServerRpc(from, direction);
 

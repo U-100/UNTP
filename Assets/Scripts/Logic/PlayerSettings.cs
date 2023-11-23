@@ -17,5 +17,8 @@ namespace UNTP
 
         [SerializeField] private float _visionSize = 10.0f;
         public float visionSize => this._visionSize;
+
+        [SerializeField] private float _shotCooldown = 1.0f;
+        public float shotCooldown => this._shotCooldown;
     }
 }
