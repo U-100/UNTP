@@ -8,35 +8,26 @@ using float3 = Unity.Mathematics.float3;
 
 namespace UNTP
 {
-	public class EnemyLogic
+	public static class EnemyLogic
 	{
-		private readonly EnemySettings _enemySettings;
-		private readonly IGamePhysics _gamePhysics;
+		private static Random _random = new(113);
 
-		private Random _random = new(113);
-
-		public EnemyLogic(EnemySettings enemySettings, IGamePhysics gamePhysics)
-		{
-			this._enemySettings = enemySettings;
-			this._gamePhysics = gamePhysics;
-		}
-
-		public void UpdateEnemies(IGameBoard board, float deltaTime)
+		public static void UpdateEnemies(IGameBoard board, float deltaTime)
 		{
 			SpawnEnemies(board);
 			UpdatePhysicalChunksNearEnemies(board);
 			BehaveEnemies(board, deltaTime);
 		}
 
-		private void SpawnEnemies(IGameBoard board)
+		private static void SpawnEnemies(IGameBoard board)
 		{
-			if (board.enemies.count < this._enemySettings.enemiesPerPlayer * board.players.count)
+			if (board.enemies.count < board.settings.enemySettings.enemiesPerPlayer * board.players.count)
 			{
-				int randomPlayerIndex = this._random.NextInt(0, board.players.count);
+				int randomPlayerIndex = _random.NextInt(0, board.players.count);
 				IPlayer randomPlayer = board.players[randomPlayerIndex];
 
-				float randomAngle = this._random.NextFloat(0.0f, radians(360.0f));
-				float randomRange = this._random.NextFloat(this._enemySettings.spawnDistanceRange[0], this._enemySettings.spawnDistanceRange[1]);
+				float randomAngle = _random.NextFloat(0.0f, radians(360.0f));
+				float randomRange = _random.NextFloat(board.settings.enemySettings.spawnDistanceRange[0], board.settings.enemySettings.spawnDistanceRange[1]);
 				float3 proposedEnemyPosition = randomPlayer.character.position + mul(Unity.Mathematics.quaternion.RotateY(randomAngle), float3(1, 0, 0)) * randomRange;
 				
 				if (board.enemies.count == 0)
@@ -53,7 +44,7 @@ namespace UNTP
 			}
 		}
 
-		private void UpdatePhysicalChunksNearEnemies(IGameBoard board)
+		private static void UpdatePhysicalChunksNearEnemies(IGameBoard board)
 		{
 			for (int enemyIndex = 0; enemyIndex < board.enemies.count; ++enemyIndex)
 			{
@@ -62,7 +53,7 @@ namespace UNTP
 			}
 		}
 
-		private void BehaveEnemies(IGameBoard board, float deltaTime)
+		private static void BehaveEnemies(IGameBoard board, float deltaTime)
 		{
 			for (int enemyIndex = 0; enemyIndex < board.enemies.count;)
 			{
@@ -117,22 +108,22 @@ namespace UNTP
 			return true;
 		}
 		
-		private Status UpdateWalker(IGameBoard board, IWalker enemy, float deltaTime)
+		private static Status UpdateWalker(IGameBoard board, IWalker enemy, float deltaTime)
 		{
 			if(!FindNearestPlayer(board, enemy.position, out float3 nearestPlayerPosition, out float distanceToNearestPlayer))
 				return Status.RUNNING; // just wait until we find nearest player
 
-			if (distanceToNearestPlayer < this._enemySettings.touchDistance)
+			if (distanceToNearestPlayer < board.settings.enemySettings.touchDistance)
 				return Status.COMPLETE; // finish enemy life when touched player
 
 			// rush is allowed when we have target player and we are close enough horizontally and vertically
-			if (abs(nearestPlayerPosition.y - enemy.position.y) < this._enemySettings.radius && distanceToNearestPlayer < this._enemySettings.horizontalRushDistance)
-				return MoveTo(enemy, nearestPlayerPosition, deltaTime);
+			if (abs(nearestPlayerPosition.y - enemy.position.y) < board.settings.enemySettings.radius && distanceToNearestPlayer < board.settings.enemySettings.horizontalRushDistance)
+				return MoveTo(board, enemy, nearestPlayerPosition, deltaTime);
 
-			if (enemy.path.Count == 0 || distance(enemy.path[^1], nearestPlayerPosition) > this._enemySettings.pathEndToleranceDistance)
+			if (enemy.path.Count == 0 || distance(enemy.path[^1], nearestPlayerPosition) > board.settings.enemySettings.pathEndToleranceDistance)
 			{
 				// we need a new path to follow
-				int3 from = (int3)floor(enemy.position - float3(0, this._enemySettings.radius, 0));
+				int3 from = (int3)floor(enemy.position - float3(0, board.settings.enemySettings.radius, 0));
 				int3 maxPathAreaSize = 10;
 				int3 to = (int3)floor(nearestPlayerPosition);
 				SlopeWalker slopeWalker = new SlopeWalker(board.worldMap, from, maxPathAreaSize);
@@ -145,7 +136,7 @@ namespace UNTP
 				float3 position = enemy.position;
 				float3 targetCellMiddle = enemy.path[0] + float3(0.5f);
 
-				if (distance(targetCellMiddle, position) < this._enemySettings.pathToleranceDistance)
+				if (distance(targetCellMiddle, position) < board.settings.enemySettings.pathToleranceDistance)
 					enemy.path.RemoveAt(0);
 
 				if (enemy.path.Count > 0)
@@ -154,21 +145,21 @@ namespace UNTP
 					//float3 p = position;
 					//foreach (var pathPoint in enemy.path)
 					//{
-					//	float3 pp = pathPoint + float3(0.5f, this._enemySettings.radius, 0.5f);
+					//	float3 pp = pathPoint + float3(0.5f, board.settings.enemySettings.radius, 0.5f);
 					//	UnityEngine.Debug.DrawLine(p, pp, UnityEngine.Color.yellow);
 					//	p = pp;
 					//}
 
-					float3 targetPosition = enemy.path[0] + float3(0.5f, this._enemySettings.radius, 0.5f);
+					float3 targetPosition = enemy.path[0] + float3(0.5f, board.settings.enemySettings.radius, 0.5f);
 
 					//UnityEngine.Debug.DrawLine(position, targetPosition, UnityEngine.Color.cyan);
 
-					return MoveTo(enemy, targetPosition, deltaTime);
+					return MoveTo(board, enemy, targetPosition, deltaTime);
 				}
 			}
 
 			// fallback behaviour - just move in player direction
-			return MoveTo(enemy, nearestPlayerPosition, deltaTime);
+			return MoveTo(board, enemy, nearestPlayerPosition, deltaTime);
 		}
 
 		private const float STRIDER_HEIGHT = 3.0f;
@@ -176,7 +167,7 @@ namespace UNTP
 		private const float STRIDER_TURN_SPEED_DEGREES_PER_SEC = 30.0f;
 		private const float STRIDER_LEG_SPEED = 3.5f;
 
-		private void SetupStriderLegs(IGameBoard board, IStrider strider)
+		private static void SetupStriderLegs(IGameBoard board, IStrider strider)
 		{
 			for (int legIndex = 0; legIndex < strider.legs.Count; legIndex++)
 			{
@@ -186,7 +177,7 @@ namespace UNTP
 			}
 		}
 		
-		private Status UpdateStrider(IGameBoard board, IStrider strider, float deltaTime)
+		private static Status UpdateStrider(IGameBoard board, IStrider strider, float deltaTime)
 		{
 			if(!FindNearestPlayer(board, strider.position, out float3 nearestPlayerPosition, out float _))
 				return Status.RUNNING; // if there are no players - just wait
@@ -310,7 +301,7 @@ namespace UNTP
 		private const float MIN_HORIZONTAL_LEG_DISTANCE = 1f;//2.0f;
 		private const float OPTIMAL_LEG_DISTANCE = 3f;//3.75f;
 		
-		private float3 GetDesiredLegPosition(IGameBoard board, IStrider strider, int legIndex)
+		private static float3 GetDesiredLegPosition(IGameBoard board, IStrider strider, int legIndex)
 		{
 			float desiredLegAngle = (legIndex + 0.5f) * radians(360.0f / strider.legs.Count);
 
@@ -335,7 +326,7 @@ namespace UNTP
 			return desiredLegPosition;
 		}
 
-		private Status MoveTo(IEnemy enemy, float3 targetPosition, float deltaTime)
+		private static Status MoveTo(IGameBoard board, IEnemy enemy, float3 targetPosition, float deltaTime)
 		{
 			float3 position = enemy.position;
 			float3 horizontalDirectionToTarget = targetPosition - position;
@@ -344,7 +335,7 @@ namespace UNTP
 
 			//UnityEngine.Debug.DrawRay(position, horizontalDirectionToTarget, Color.green);
 
-			float3 movement = horizontalDirectionToTarget * this._enemySettings.speed * deltaTime;
+			float3 movement = horizontalDirectionToTarget * board.settings.enemySettings.speed * deltaTime;
 
 			quaternion rotation = enemy.rotation;
 
@@ -352,12 +343,12 @@ namespace UNTP
 
 			MoveSphericalCharacterResult moveSphericalCharacterResult =
 				CharacterMovementLogic.MoveSphericalCharacter(
-					this._gamePhysics,
+					board.physics,
 					position,
 					rotation,
-					this._enemySettings.radius,
+					board.settings.enemySettings.radius,
 					movement,
-					this._enemySettings.stepHeight,
+					board.settings.enemySettings.stepHeight,
 					deltaTime,
 					CharacterMovementLogic.DEFAULT_SKIN_WIDTH,
 					CharacterMovementLogic.DEFAULT_MOVE_ITERATIONS

@@ -5,18 +5,9 @@ using static Unity.Mathematics.math;
 
 namespace UNTP
 {
-	public class LocalPlayerLogic
+	public static class LocalPlayerLogic
 	{
-		private readonly PlayerSettings _playerSettings;
-		private readonly IGamePhysics _gamePhysics;
-
-		public LocalPlayerLogic(PlayerSettings playerSettings, IGamePhysics gamePhysics)
-		{
-			this._playerSettings = playerSettings;
-			this._gamePhysics = gamePhysics;
-		}
-
-		public Status Update(IGameBoard board, float deltaTime) =>
+		public static Status Update(IGameBoard board, float deltaTime) =>
 			board.players.localPlayer.character != null // if this client's player character is present
 			&& UpdateChunksNearPlayer(board)
 			&& (
@@ -25,32 +16,32 @@ namespace UNTP
 				+ Construct(board, deltaTime)
 			);
 
-		private Status UpdateChunksNearPlayer(IGameBoard board)
+		private static Status UpdateChunksNearPlayer(IGameBoard board)
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 
 			board.worldMap.MaterializePhysicalRange(localPlayerCharacter.position - 2, localPlayerCharacter.position + 2);
-			board.worldMap.MaterializeVisualRange(localPlayerCharacter.position - this._playerSettings.visionSize, localPlayerCharacter.position + this._playerSettings.visionSize);
+			board.worldMap.MaterializeVisualRange(localPlayerCharacter.position - board.settings.playerSettings.visionSize, localPlayerCharacter.position + board.settings.playerSettings.visionSize);
 
 			return Status.COMPLETE;
 		}
 
-		private Status Move(IGameBoard board, float deltaTime)
+		private static Status Move(IGameBoard board, float deltaTime)
 		{
 			float2 moveInput = board.input.move;
-			float3 velocity = float3(moveInput.x, 0, moveInput.y) * this._playerSettings.speed;
+			float3 velocity = float3(moveInput.x, 0, moveInput.y) * board.settings.playerSettings.speed;
 			float3 movement = velocity * deltaTime;
 
 			IPlayer localPlayer = board.players.localPlayer;
 
 			MoveSphericalCharacterResult moveSphericalCharacterResult =
 				CharacterMovementLogic.MoveSphericalCharacter(
-					this._gamePhysics,
+					board.physics,
 					localPlayer.character.position,
 					localPlayer.character.rotation,
-					this._playerSettings.radius,
+					board.settings.playerSettings.radius,
 					movement,
-					this._playerSettings.stepHeight,
+					board.settings.playerSettings.stepHeight,
 					deltaTime,
 					CharacterMovementLogic.DEFAULT_SKIN_WIDTH,
 					CharacterMovementLogic.DEFAULT_MOVE_ITERATIONS
@@ -62,14 +53,14 @@ namespace UNTP
 			return Status.RUNNING;
 		}
 
-		private Status Shoot(IGameBoard board, float deltaTime)
+		private static Status Shoot(IGameBoard board, float deltaTime)
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 
 			localPlayerCharacter.timeSinceLastShot += deltaTime;
 
 			float2 inputFireAim = board.input.fireAim;
-			if(length(inputFireAim) > 0 && localPlayerCharacter.timeSinceLastShot > this._playerSettings.shotCooldown)
+			if(length(inputFireAim) > 0 && localPlayerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
 			{
 				localPlayerCharacter.Shoot(localPlayerCharacter.position, float3(inputFireAim.x, 0, inputFireAim.y));
 				localPlayerCharacter.timeSinceLastShot = 0;
@@ -78,39 +69,40 @@ namespace UNTP
 			return Status.RUNNING;
 		}
 
-		private Status Construct(IGameBoard board, float deltaTime) => StartConstruction(board) && ApplyConstructionState(board, deltaTime) && FinishConstruction(board);
+		private static Status Construct(IGameBoard board, float deltaTime) => StartConstruction(board) && ApplyConstructionState(board, deltaTime) && FinishConstruction(board);
 
-		private Status FinishConstruction(IGameBoard board) => CompleteConstruction(board) + CancelConstruction(board);
+		private static Status FinishConstruction(IGameBoard board) => CompleteConstruction(board) + CancelConstruction(board);
 
-		private Status StartConstruction(IGameBoard board) =>
+		private static Status StartConstruction(IGameBoard board) =>
 			board.players.localPlayer.constructionState != ConstructionState.NoConstruction ||
-			board.input.startConstructionPlacement && StartConstructionPlacement(board.players.localPlayer);
+			board.input.startConstructionPlacement && StartConstructionPlacement(board);
 
-		private Status StartConstructionPlacement(IPlayer localPlayer)
+		private static Status StartConstructionPlacement(IGameBoard board)
 		{
-			float3 blueprintCellPos = BlueprintCellPos(localPlayer.character);
+			IPlayer localPlayer = board.players.localPlayer;
+			float3 blueprintCellPos = BlueprintCellPos(board);
 			localPlayer.blueprint.position = blueprintCellPos;
 			localPlayer.constructionState = ConstructionState.ConstructionAllowed;
 
 			return Status.COMPLETE;
 		}
 
-		private Status ApplyConstructionState(IGameBoard board, float deltaTime)
+		private static Status ApplyConstructionState(IGameBoard board, float deltaTime)
 		{
 			IPlayer localPlayer = board.players.localPlayer;
 
-			float3 newBlueprintPos = BlueprintCellPos(localPlayer.character);
+			float3 newBlueprintPos = BlueprintCellPos(board);
 			float3 oldBlueprintPos = localPlayer.blueprint.position;
 
 			float fullDistance = length(newBlueprintPos - oldBlueprintPos);
-			float maxDistance = this._playerSettings.speed * 4.0f * deltaTime;
+			float maxDistance = board.settings.playerSettings.speed * 4.0f * deltaTime;
 			float distance = min(fullDistance, maxDistance);
 
 			float3 interpolatedBlueprintPos = fullDistance > 0 ? lerp(oldBlueprintPos, newBlueprintPos, distance / fullDistance) : newBlueprintPos;
 
 			localPlayer.blueprint.position = interpolatedBlueprintPos;
 
-			if (this._gamePhysics.CheckBox(newBlueprintPos + float3(0.5f), float3(0.45f)))
+			if (board.physics.CheckBox(newBlueprintPos + float3(0.5f), float3(0.45f)))
 			{
 				localPlayer.blueprint.active = false;
 				localPlayer.constructionState = ConstructionState.ConstructionRestricted;
@@ -127,7 +119,7 @@ namespace UNTP
 			return Status.COMPLETE;
 		}
 
-		private Status CompleteConstruction(IGameBoard board)
+		private static Status CompleteConstruction(IGameBoard board)
 		{
 			if (board.input.confirmConstructionPlacement)
 			{
@@ -135,7 +127,7 @@ namespace UNTP
 				localPlayer.constructionState = ConstructionState.NoConstruction;
 				localPlayer.blueprint.active = false;
 
-				int3 blueprintPosition = (int3)BlueprintCellPos(localPlayer.character);
+				int3 blueprintPosition = (int3)BlueprintCellPos(board);
 				board.worldMap[blueprintPosition] =
 					new WorldMapCell
 					{
@@ -148,9 +140,13 @@ namespace UNTP
 			return Status.RUNNING;
 		}
 
-		private float3 BlueprintCellPos(IPlayerCharacter playerCharacter) => floor(playerCharacter.position + playerCharacter.forward * (this._playerSettings.radius + 1.0f));
+		private static float3 BlueprintCellPos(IGameBoard board)
+		{
+			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
+			return floor(localPlayerCharacter.position + localPlayerCharacter.forward * (board.settings.playerSettings.radius + 1.0f));
+		}
 
-		private Status CancelConstruction(IGameBoard board)
+		private static Status CancelConstruction(IGameBoard board)
 		{
 			if (board.input.cancelConstructionPlacement)
 			{

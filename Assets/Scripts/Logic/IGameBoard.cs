@@ -7,7 +7,9 @@ namespace UNTP
 	public interface IGameBoard
 	{
 		IGame game { get; }
+		IGameSettings settings { get; }
 		IGameInput input { get; }
+		IGamePhysics physics { get; }
 		IWorldMap worldMap { get; }
 		IPlayersRepository players { get; }
 		IEnemyRepository enemies { get; }

@@ -2,8 +2,15 @@ using UnityEngine;
 
 namespace UNTP
 {
+	public interface IGameSettings
+	{
+		WorldSettings worldSettings { get; }
+		PlayerSettings playerSettings { get; }
+		EnemySettings enemySettings { get; }
+	}
+	
 	[CreateAssetMenu]
-	public class GameSettings : ScriptableObject
+	public class GameSettings : ScriptableObject, IGameSettings
 	{
 		[Header("General")]
 

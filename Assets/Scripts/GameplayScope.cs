@@ -57,7 +57,9 @@ namespace UNTP
 
 		public void InitNetworkGameBoard(NetworkGameBoard networkGameBoard, ulong ownerClientId, float3 position, quaternion rotation)
 		{
+			networkGameBoard.settings = this.gameSettings;
 			networkGameBoard.input = this.gameInput;
+			networkGameBoard.physics = this.gamePhysics;
 			
 			GameObject gameObject = networkGameBoard.gameObject;
 
@@ -77,13 +79,7 @@ namespace UNTP
 		public NetworkDiscovery networkDiscovery => this._networkDiscovery ??= new NetworkDiscovery(this.appId, this.discoveryPort);
 
 		private GameLogic _gameLogic;
-		public IGameLogic gameLogic => this._gameLogic ??= new GameLogic(this.gameSettings.playerSettings, this.localPlayerLogic, this.enemyLogic);
-
-		private LocalPlayerLogic _localPlayerLogic;
-		public LocalPlayerLogic localPlayerLogic => this._localPlayerLogic ??= new LocalPlayerLogic(this.gameSettings.playerSettings, this.gamePhysics);
-
-		private EnemyLogic _enemyLogic;
-		public EnemyLogic enemyLogic => this._enemyLogic ??= new EnemyLogic(this.gameSettings.enemySettings, this.gamePhysics);
+		public IGameLogic gameLogic => this._gameLogic ??= new GameLogic();
 
 		private GamePhysics _gamePhysics;
 		public IGamePhysics gamePhysics => this._gamePhysics ??= new GamePhysics();
