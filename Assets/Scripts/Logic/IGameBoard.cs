@@ -7,6 +7,7 @@ namespace UNTP
 	public interface IGameBoard
 	{
 		IGame game { get; }
+		IGameInput input { get; }
 		IWorldMap worldMap { get; }
 		IPlayersRepository players { get; }
 		IEnemyRepository enemies { get; }
@@ -104,7 +105,6 @@ namespace UNTP
 		float3 position { get; set; }
 		quaternion rotation { get; set; }
 		float3 forward { get; set; }
-		float3 fireAim { get; set; }
 
 		float timeSinceLastShot { get; set; }
 		

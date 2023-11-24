@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 
@@ -5,6 +6,32 @@ using static Unity.Mathematics.math;
 
 namespace UNTP
 {
+	public enum HudIndicatorKind
+	{
+		Ally,
+		SmallEnemy,
+		BigEnemy,
+	}
+	
+	public struct HudIndicatorData
+	{
+		public HudIndicatorKind kind;
+		public float2 positionScreenFactor;
+	}
+
+	public interface IHudViewModel : IDisposable
+	{
+		ConstructionState constructionState { get; }
+		
+		public IReadOnlyList<HudIndicatorData> CalculateIndicators();
+
+		void SetInputMove(float2 move);
+		void SetInputFireAim(float2 fireAim);
+		void SetInputStartConstructionPlacement(bool startConstructionPlacement);
+		void SetInputConfirmConstructionPlacement(bool confirmConstructionPlacement);
+		void SetInputCancelConstructionPlacement(bool cancelConstructionPlacement);
+	}
+
 	public class HudViewModel : IHudViewModel
 	{
 		private readonly IGameplay _gameplay;
@@ -17,57 +44,75 @@ namespace UNTP
 		}
 
 		public void Dispose() { }
-		
-		public ConstructionState constructionState => this._gameplay?.gameBoard.players.localPlayer.constructionState ?? ConstructionState.NoConstruction;
+
+		public ConstructionState constructionState => this._gameplay.gameBoard.players.localPlayer.constructionState;
 		
 		public IReadOnlyList<HudIndicatorData> CalculateIndicators()
 		{
-			if (this._gameplay is not null)
-			{
-				int requiredIndicatorsCount = 0;
+			int requiredIndicatorsCount = 0;
 
-				int playersCount = this._gameplay.gameBoard.players.count;
-				for (int playerIndex = 0; playerIndex < playersCount; ++playerIndex)
+			int playersCount = this._gameplay.gameBoard.players.count;
+			for (int playerIndex = 0; playerIndex < playersCount; ++playerIndex)
+			{
+				if (TryGetAllyIndicator(this._gameplay.gameBoard.players[playerIndex], out HudIndicatorData indicator))
 				{
-					if (TryGetAllyIndicator(this._gameplay.gameBoard.players[playerIndex], out HudIndicatorData indicator))
-					{
-						if (requiredIndicatorsCount < this._indicators.Count)
-							this._indicators[requiredIndicatorsCount] = indicator;
-						else
-							this._indicators.Insert(requiredIndicatorsCount, indicator);
-						
-						++requiredIndicatorsCount;
-					}
+					if (requiredIndicatorsCount < this._indicators.Count)
+						this._indicators[requiredIndicatorsCount] = indicator;
+					else
+						this._indicators.Insert(requiredIndicatorsCount, indicator);
+					
+					++requiredIndicatorsCount;
 				}
-				
-				int enemiesCount = this._gameplay.gameBoard.enemies.count;
-				for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
-				{
-					if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
-					{
-						if (requiredIndicatorsCount < this._indicators.Count)
-							this._indicators[requiredIndicatorsCount] = indicator;
-						else
-							this._indicators.Insert(requiredIndicatorsCount, indicator);
-						
-						++requiredIndicatorsCount;
-					}
-				}
-			
-				if (this._indicators.Count > requiredIndicatorsCount)
-					this._indicators.RemoveRange(requiredIndicatorsCount, this._indicators.Count - requiredIndicatorsCount);
 			}
-			else
-				this._indicators.Clear();
+			
+			int enemiesCount = this._gameplay.gameBoard.enemies.count;
+			for (int enemyIndex = 0; enemyIndex < enemiesCount; ++enemyIndex)
+			{
+				if (TryGetEnemyIndicator(this._gameplay.gameBoard.enemies[enemyIndex], out HudIndicatorData indicator))
+				{
+					if (requiredIndicatorsCount < this._indicators.Count)
+						this._indicators[requiredIndicatorsCount] = indicator;
+					else
+						this._indicators.Insert(requiredIndicatorsCount, indicator);
+					
+					++requiredIndicatorsCount;
+				}
+			}
+		
+			if (this._indicators.Count > requiredIndicatorsCount)
+				this._indicators.RemoveRange(requiredIndicatorsCount, this._indicators.Count - requiredIndicatorsCount);
 			
 			return this._indicators;
 		}
 
-		public void SetFireAim(float2 fireAim)
+		public void SetInputMove(float2 move)
 		{
-			IPlayerCharacter localPlayerCharacter = this._gameplay?.gameBoard.players.localPlayer?.character;
-			if (localPlayerCharacter != null)
-				localPlayerCharacter.fireAim = new float3(fireAim.x, 0, -fireAim.y);
+			if (this._gameplay.gameBoard != null)
+				this._gameplay.gameBoard.input.move = move;
+		}
+
+		public void SetInputFireAim(float2 fireAim)
+		{
+			if (this._gameplay.gameBoard != null)
+				this._gameplay.gameBoard.input.fireAim = fireAim;
+		}
+
+		public void SetInputStartConstructionPlacement(bool startConstructionPlacement)
+		{
+			if (this._gameplay.gameBoard != null)
+				this._gameplay.gameBoard.input.startConstructionPlacement = startConstructionPlacement;
+		}
+
+		public void SetInputConfirmConstructionPlacement(bool confirmConstructionPlacement)
+		{
+			if (this._gameplay.gameBoard != null)
+				this._gameplay.gameBoard.input.confirmConstructionPlacement = confirmConstructionPlacement;
+		}
+
+		public void SetInputCancelConstructionPlacement(bool cancelConstructionPlacement)
+		{
+			if (this._gameplay.gameBoard != null)
+				this._gameplay.gameBoard.input.cancelConstructionPlacement = cancelConstructionPlacement;
 		}
 
 		private bool TryGetAllyIndicator(IPlayer player, out HudIndicatorData indicator)

@@ -8,13 +8,11 @@ namespace UNTP
 	public class LocalPlayerLogic
 	{
 		private readonly PlayerSettings _playerSettings;
-		private readonly IGameInputSource _gameInputSource;
 		private readonly IGamePhysics _gamePhysics;
 
-		public LocalPlayerLogic(PlayerSettings playerSettings, IGameInputSource gameInputSource, IGamePhysics gamePhysics)
+		public LocalPlayerLogic(PlayerSettings playerSettings, IGamePhysics gamePhysics)
 		{
 			this._playerSettings = playerSettings;
-			this._gameInputSource = gameInputSource;
 			this._gamePhysics = gamePhysics;
 		}
 
@@ -39,7 +37,7 @@ namespace UNTP
 
 		private Status Move(IGameBoard board, float deltaTime)
 		{
-			float2 moveInput = this._gameInputSource.input.move;
+			float2 moveInput = board.input.move;
 			float3 velocity = float3(moveInput.x, 0, moveInput.y) * this._playerSettings.speed;
 			float3 movement = velocity * deltaTime;
 
@@ -69,10 +67,11 @@ namespace UNTP
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 
 			localPlayerCharacter.timeSinceLastShot += deltaTime;
-			
-			if(length(localPlayerCharacter.fireAim) > 0 && localPlayerCharacter.timeSinceLastShot > this._playerSettings.shotCooldown)
+
+			float2 inputFireAim = board.input.fireAim;
+			if(length(inputFireAim) > 0 && localPlayerCharacter.timeSinceLastShot > this._playerSettings.shotCooldown)
 			{
-				localPlayerCharacter.Shoot(localPlayerCharacter.position, localPlayerCharacter.fireAim);
+				localPlayerCharacter.Shoot(localPlayerCharacter.position, float3(inputFireAim.x, 0, inputFireAim.y));
 				localPlayerCharacter.timeSinceLastShot = 0;
 			}
 			
@@ -83,7 +82,9 @@ namespace UNTP
 
 		private Status FinishConstruction(IGameBoard board) => CompleteConstruction(board) + CancelConstruction(board);
 
-		private Status StartConstruction(IGameBoard board) => board.players.localPlayer.constructionState != ConstructionState.NoConstruction || this._gameInputSource.input.startConstructionPlacement && StartConstructionPlacement(board.players.localPlayer);
+		private Status StartConstruction(IGameBoard board) =>
+			board.players.localPlayer.constructionState != ConstructionState.NoConstruction ||
+			board.input.startConstructionPlacement && StartConstructionPlacement(board.players.localPlayer);
 
 		private Status StartConstructionPlacement(IPlayer localPlayer)
 		{
@@ -128,7 +129,7 @@ namespace UNTP
 
 		private Status CompleteConstruction(IGameBoard board)
 		{
-			if (this._gameInputSource.input.confirmConstructionPlacement)
+			if (board.input.confirmConstructionPlacement)
 			{
 				IPlayer localPlayer = board.players.localPlayer;
 				localPlayer.constructionState = ConstructionState.NoConstruction;
@@ -151,7 +152,7 @@ namespace UNTP
 
 		private Status CancelConstruction(IGameBoard board)
 		{
-			if (this._gameInputSource.input.cancelConstructionPlacement)
+			if (board.input.cancelConstructionPlacement)
 			{
 				IPlayer localPlayer = board.players.localPlayer;
 				localPlayer.constructionState = ConstructionState.NoConstruction;

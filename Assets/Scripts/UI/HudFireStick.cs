@@ -15,6 +15,7 @@ namespace UNTP
 
         private VisualElement _knobParent;
         private VisualElement _knob;
+        private bool _active;
         
         public HudFireStick()
         {
@@ -36,38 +37,35 @@ namespace UNTP
             RegisterCallback<PointerMoveEvent>(this.OnPointerMove);
         }
 
-        private bool _active;
-        public bool active
+        private void SetActive(bool active)
         {
-            get => this._active;
-            set
-            {
-                this._active = value;
-                this._knobParent.visible = this._active;
-                EnableInClassList(USS_CLASS_HUD_FIRE_STICK_ACTIVE, this._active);
-                this._knob.EnableInClassList(USS_CLASS_HUD_FIRE_STICK_KNOB_ACTIVE, this._active);
-            }
+            this._active = active;
+            this._knobParent.visible = this._active;
+            EnableInClassList(USS_CLASS_HUD_FIRE_STICK_ACTIVE, this._active);
+            this._knob.EnableInClassList(USS_CLASS_HUD_FIRE_STICK_KNOB_ACTIVE, this._active);
+            if (!this._active)
+                this.value = null;
         }
 
-        public float2 value { get; private set; }
+        public float2? value { get; private set; }
 
         private void OnPointerDown(PointerDownEvent evt)
         {
             this.CapturePointer(evt.pointerId);
-            this.active = true;
+            SetActive(true);
             SetKnobPositionFromEventLocalPosition(evt.localPosition);
         }
 
         private void OnPointerUp(PointerUpEvent evt)
         {
             this.ReleasePointer(evt.pointerId);
-            this.active = false;
-            this.value = 0;
+            SetActive(false);
         }
 
         private void OnPointerMove(PointerMoveEvent evt)
         {
-            SetKnobPositionFromEventLocalPosition(evt.localPosition);
+            if(this._active)
+                SetKnobPositionFromEventLocalPosition(evt.localPosition);
         }
 
         private void SetKnobPositionFromEventLocalPosition(Vector3 localPosition)
@@ -82,7 +80,7 @@ namespace UNTP
             this._knobParent.style.left = correctedLocalPosition.x;
             this._knobParent.style.top = correctedLocalPosition.y;
 
-            this.value = this.active && lengthsq(delta) > 0.001f ? normalize(delta) : 0;
+            this.value = normalizesafe(delta) * float2(1, -1); // we need to invert Y-axis for it to point upwards (in UI Toolkit coordinate system Y-axis points downwards)
         }
     }
 }

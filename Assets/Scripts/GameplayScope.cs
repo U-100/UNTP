@@ -57,6 +57,8 @@ namespace UNTP
 
 		public void InitNetworkGameBoard(NetworkGameBoard networkGameBoard, ulong ownerClientId, float3 position, quaternion rotation)
 		{
+			networkGameBoard.input = this.gameInput;
+			
 			GameObject gameObject = networkGameBoard.gameObject;
 
 			gameObject.GetComponent<NetworkWorldMap>().Init(this.worldGen, this.gameSettings.chunkSize, this.CreateVisualChunk, this.CreatePhysicalChunk);
@@ -78,7 +80,7 @@ namespace UNTP
 		public IGameLogic gameLogic => this._gameLogic ??= new GameLogic(this.gameSettings.playerSettings, this.localPlayerLogic, this.enemyLogic);
 
 		private LocalPlayerLogic _localPlayerLogic;
-		public LocalPlayerLogic localPlayerLogic => this._localPlayerLogic ??= new LocalPlayerLogic(this.gameSettings.playerSettings, this.gameInputSource, this.gamePhysics);
+		public LocalPlayerLogic localPlayerLogic => this._localPlayerLogic ??= new LocalPlayerLogic(this.gameSettings.playerSettings, this.gamePhysics);
 
 		private EnemyLogic _enemyLogic;
 		public EnemyLogic enemyLogic => this._enemyLogic ??= new EnemyLogic(this.gameSettings.enemySettings, this.gamePhysics);
@@ -86,8 +88,8 @@ namespace UNTP
 		private GamePhysics _gamePhysics;
 		public IGamePhysics gamePhysics => this._gamePhysics ??= new GamePhysics();
 
-		private GameInputSource _gameInputSource;
-		public IGameInputSource gameInputSource => this._gameInputSource ??= new GameInputSource().AddDisposableTo(this);
+		private GameInput _gameInput;
+		public IGameInput gameInput => this._gameInput ??= new GameInput();
 
 		private WorldGen _worldGen;
 		public IWorldGen worldGen => this._worldGen ??= new WorldGen(this.gameSettings.worldSettings);

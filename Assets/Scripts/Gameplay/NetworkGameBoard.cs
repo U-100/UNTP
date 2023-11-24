@@ -11,6 +11,7 @@ namespace UNTP
 		[SerializeField] private NetworkEnemyRepository _networkEnemyRepository = null;
 
 		public IGame game => this._networkGame;
+		public IGameInput input { get; set; }
 		public IWorldMap worldMap => this._networkWorldMap;
 		public IPlayersRepository players => this._networkPlayersRepository;
 		public IEnemyRepository enemies => this._networkEnemyRepository;

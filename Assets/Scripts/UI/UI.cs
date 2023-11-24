@@ -36,28 +36,6 @@ namespace UNTP
 		void Resume();
 	}
 
-	public enum HudIndicatorKind
-	{
-		Ally,
-		SmallEnemy,
-		BigEnemy,
-	}
-	
-	public struct HudIndicatorData
-	{
-		public HudIndicatorKind kind;
-		public float2 positionScreenFactor;
-	}
-
-	public interface IHudViewModel : IDisposable
-	{
-		ConstructionState constructionState { get; }
-		
-		public IReadOnlyList<HudIndicatorData> CalculateIndicators();
-
-		void SetFireAim(float2 fireAim);
-	}
-
 	public class UI : MonoBehaviour
 	{
 		[SerializeField]
@@ -109,7 +87,7 @@ namespace UNTP
 		private Button _hudCancelConstructionPlacementButton;
 		private HudFireStick _hudFireStick;
 
-		private Gamepad _fakeGamepad;
+		private PlayerInputActions _playerInputActions;
 		
 
 		public IMainViewModel viewModel { get; set; }
@@ -191,7 +169,8 @@ namespace UNTP
 
 			this._hudFireStick = this._hud.Q<HudFireStick>("HudFireStick");
 
-			this._fakeGamepad = InputSystem.AddDevice<Gamepad>();
+			this._playerInputActions = new PlayerInputActions();
+			this._playerInputActions.Enable();
 		}
 
 		void OnDisable()
@@ -212,7 +191,8 @@ namespace UNTP
 			this._hudLeftStickTouchArea.UnregisterCallback<PointerUpEvent>(this.OnHudLeftStickTouchAreaPointerUp);
 			this._hudLeftStickTouchArea.UnregisterCallback<PointerLeaveEvent>(this.OnHudLeftStickTouchAreaPointerLeave);
 
-			InputSystem.RemoveDevice(this._fakeGamepad);
+			this._playerInputActions.Disable();
+			this._playerInputActions = null;
 		}
 
 		void Update()
@@ -282,20 +262,34 @@ namespace UNTP
 		{
 			(bool activated, bool deactivated) = SetScreenEnabled(this._hud, this.viewModel.state == MainViewModelState.GamePlaying);
 
-			if (activated)
+			UpdateHudControls(activated, deactivated);
+			
+			// send input values to view model
+			if (this.viewModel.hud != null)
 			{
-				this._hudLeftStickOuterKnob.visible = false;
-				InputSystem.QueueDeltaStateEvent(this._fakeGamepad.leftStick, Vector2.zero);
+				this.viewModel.hud.SetInputMove(this._hudInputMove ?? this._playerInputActions.Player.Move.ReadValue<Vector2>());
+				this.viewModel.hud.SetInputFireAim(this._hudFireStick.value ?? this._playerInputActions.Player.Aim.ReadValue<Vector2>());
+				this.viewModel.hud.SetInputStartConstructionPlacement(this._hudInputStartConstructionPlacement || this._playerInputActions.Player.StartConstructionPlacement.WasPerformedThisFrame());
+				this.viewModel.hud.SetInputConfirmConstructionPlacement(this._hudInputConfirmConstructionPlacement || this._playerInputActions.Player.ConfirmConstructionPlacement.WasPerformedThisFrame());
+				this.viewModel.hud.SetInputCancelConstructionPlacement(this._hudInputCancelConstructionPlacement || this._playerInputActions.Player.CancelConstructionPlacement.WasPerformedThisFrame());
 			}
+			// values have been consumed this frame - reset them
+			this._hudInputStartConstructionPlacement = false;
+			this._hudInputConfirmConstructionPlacement = false;
+			this._hudInputCancelConstructionPlacement = false;
+		}
 
+		private void UpdateHudControls(bool activated, bool deactivated)
+		{
+			if (activated)
+				this._hudLeftStickOuterKnob.visible = false;
+			
 			if (this._hud.visible)
 			{
 				this._hudStartConstructionPlacementButton.visible = this.viewModel.hud?.constructionState == ConstructionState.NoConstruction;
 				this._hudConfirmConstructionPlacementButton.visible = this.viewModel.hud?.constructionState == ConstructionState.ConstructionAllowed;
 				this._hudCancelConstructionPlacementButton.visible = this.viewModel.hud?.constructionState != ConstructionState.NoConstruction;
-
-				this.viewModel.hud?.SetFireAim(this._hudFireStick.value);
-
+			
 				IReadOnlyList<HudIndicatorData> indicators = this.viewModel.hud?.CalculateIndicators();
 				int indicatorsCount = indicators?.Count ?? 0;
 				
@@ -333,9 +327,10 @@ namespace UNTP
 			}
 		}
 
-		private bool hudLeftStickActive => this._hudLeftStickOuterKnob.visible;
-
-		private Vector2 hudLeftStickPosition => new Vector2(this._hudLeftStickOuterKnob.style.left.value.value, this._hudLeftStickOuterKnob.style.top.value.value);
+		private Vector2? _hudInputMove;
+		private bool _hudInputStartConstructionPlacement;
+		private bool _hudInputConfirmConstructionPlacement;
+		private bool _hudInputCancelConstructionPlacement;
 
 		private void OnHudLeftStickTouchAreaPointerDown(PointerDownEvent evt)
 		{
@@ -347,53 +342,41 @@ namespace UNTP
 			this._hudLeftStickInnerKnob.style.left = 0;
 			this._hudLeftStickInnerKnob.style.top = 0;
 
-			InputSystem.QueueDeltaStateEvent(this._fakeGamepad.leftStick, Vector2.zero);
+			this._hudInputMove = Vector2.zero;
 		}
 
 		private void OnHudLeftStickTouchAreaPointerUp(PointerUpEvent evt)
 		{
 			this._hudLeftStickOuterKnob.visible = false;
-			InputSystem.QueueDeltaStateEvent(this._fakeGamepad.leftStick, Vector2.zero);
+			this._hudInputMove = null;
 		}
 
 		private void OnHudLeftStickTouchAreaPointerLeave(PointerLeaveEvent evt)
 		{
 			this._hudLeftStickOuterKnob.visible = false;
-			InputSystem.QueueDeltaStateEvent(this._fakeGamepad.leftStick, Vector2.zero);
+			this._hudInputMove = null;
 		}
 
 		private void OnHudLeftStickTouchAreaPointerMove(PointerMoveEvent evt)
 		{
-			if (this.hudLeftStickActive)
+			if (this._hudLeftStickOuterKnob.visible)
 			{
 				Vector2 evtPos = new Vector2(evt.position.x, evt.position.y);
-				Vector2 delta = Vector2.ClampMagnitude(evtPos - this.hudLeftStickPosition, this._hudLeftStickMaxDelta);
+
+				Vector2 hudLeftStickPosition = new Vector2(this._hudLeftStickOuterKnob.style.left.value.value, this._hudLeftStickOuterKnob.style.top.value.value);
+				Vector2 delta = Vector2.ClampMagnitude(evtPos - hudLeftStickPosition, this._hudLeftStickMaxDelta);
 
 				this._hudLeftStickInnerKnob.style.left = delta.x;
 				this._hudLeftStickInnerKnob.style.top = delta.y;
 
-				InputSystem.QueueDeltaStateEvent(this._fakeGamepad.leftStick, new Vector2(delta.x / this._hudLeftStickMaxDelta, (-1) * delta.y / this._hudLeftStickMaxDelta));
+				this._hudInputMove = new Vector2(delta.x / this._hudLeftStickMaxDelta, (-1) * delta.y / this._hudLeftStickMaxDelta);
 			}
 		}
 
 		private void OnHudPause() => this.viewModel.Pause();
 
-		private void OnHudStartConstructionPlacement() => PressInputDeviceButton(this._fakeGamepad.triangleButton);
-
-		private void OnHudConfirmConstructionPlacement() => PressInputDeviceButton(this._fakeGamepad.crossButton);
-
-		private void OnHudCancelConstructionPlacement() => PressInputDeviceButton(this._fakeGamepad.circleButton);
-
-		private static void PressInputDeviceButton(ButtonControl buttonControl)
-		{
-			using (StateEvent.From(buttonControl.device, out InputEventPtr eventPtr))
-			{
-				buttonControl.WriteValueIntoEvent(1f, eventPtr);
-				InputSystem.QueueEvent(eventPtr);
-
-				buttonControl.WriteValueIntoEvent(0f, eventPtr);
-				InputSystem.QueueEvent(eventPtr);
-			}
-		}
+		private void OnHudStartConstructionPlacement() => this._hudInputStartConstructionPlacement = true;
+		private void OnHudConfirmConstructionPlacement() => this._hudInputConfirmConstructionPlacement = true;
+		private void OnHudCancelConstructionPlacement() => this._hudInputCancelConstructionPlacement = true;
 	}
 }
