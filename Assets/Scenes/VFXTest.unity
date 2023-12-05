@@ -168,7 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ExecuteInEditor: 1
-  m_Bindings: []
+  m_Bindings:
+  - {fileID: 362219059}
   m_VisualEffect: {fileID: 362219062}
 --- !u!73398921 &362219061
 VFXRenderer:
