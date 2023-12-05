@@ -110,15 +110,42 @@ namespace UNTP
 		
 		private static Status UpdateWalker(IGameBoard board, IWalker enemy, float deltaTime)
 		{
+			float selfDestructionTime = 1.0f;
+			if (enemy.selfDestructionCountdown != null)
+			{
+				enemy.selfDestructionCountdown -= deltaTime;
+				if (enemy.selfDestructionCountdown <= 0)
+					return Status.COMPLETE;
+				
+				if (enemy.selfDestructionCountdown <= selfDestructionTime * 0.5f)
+					return Status.RUNNING;
+			}
+			
 			if(!FindNearestPlayer(board, enemy.position, out float3 nearestPlayerPosition, out float distanceToNearestPlayer))
 				return Status.RUNNING; // just wait until we find nearest player
 
-			if (distanceToNearestPlayer < board.settings.enemySettings.touchDistance)
-				return Status.COMPLETE; // finish enemy life when touched player
+			if (
+				distanceToNearestPlayer < board.settings.enemySettings.speed * selfDestructionTime + board.settings.enemySettings.radius // close enough
+				&& enemy.selfDestructionCountdown == null
+			)
+			{
+				enemy.InitiateSelfDestruction();
+				enemy.selfDestructionCountdown = selfDestructionTime;
+			}
+
+			//if (distanceToNearestPlayer < board.settings.enemySettings.touchDistance)
+			//	return Status.COMPLETE; // finish enemy life when touched player
 
 			// rush is allowed when we have target player and we are close enough horizontally and vertically
 			if (abs(nearestPlayerPosition.y - enemy.position.y) < board.settings.enemySettings.radius && distanceToNearestPlayer < board.settings.enemySettings.horizontalRushDistance)
+			{
+				if (enemy.selfDestructionCountdown == null)
+				{
+					enemy.InitiateSelfDestruction();
+					enemy.selfDestructionCountdown = 2.0f;
+				}
 				return MoveTo(board, enemy, nearestPlayerPosition, deltaTime);
+			}
 
 			if (enemy.path.Count == 0 || distance(enemy.path[^1], nearestPlayerPosition) > board.settings.enemySettings.pathEndToleranceDistance)
 			{

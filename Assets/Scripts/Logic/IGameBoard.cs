@@ -147,6 +147,9 @@ namespace UNTP
 	public interface IWalker : IEnemy
 	{
 		List<int3> path { get; set; }
+		float? selfDestructionCountdown { get; set; }
+
+		void InitiateSelfDestruction();
 	}
 
 	public interface IStrider : IEnemy
