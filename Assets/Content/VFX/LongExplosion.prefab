@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8017290686637053223}
   - component: {fileID: 6786865418167116585}
   - component: {fileID: 4797950829207928323}
+  - component: {fileID: -3019994468091403790}
   m_Layer: 0
   m_Name: LongExplosion
   m_TagString: Untagged
@@ -113,3 +114,16 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &-3019994468091403790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7717886717559981075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c5f59a4e2a248ad81af2ebcdc6627c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destructionDelay: 2
