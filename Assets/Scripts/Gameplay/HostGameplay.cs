@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace UNTP
 {
-	public class HostGameplay : IGameplay
+	public class HostGameplay : IGameplay, INetworkUpdateSystem
 	{
 		private readonly NetworkDiscovery _networkDiscovery;
 		private readonly NetworkManager _networkManager;
@@ -21,6 +21,7 @@ namespace UNTP
 		private readonly List<IDisposable> _disposables = new();
 
 		private CancellationTokenSource _serverAdvertisementCts;
+		private TaskCompletionSource<bool> _serverTcs;
 		private NetworkGameBoard _gameBoard;
 
 		public HostGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, INetworkPrefabFactory<NetworkGameBoard> gameBoardFactory, IGameLogic gameLogic)
@@ -67,16 +68,13 @@ namespace UNTP
 
 				await RunServerAdvertisement();
 
-				while (this._networkManager.IsHost)
-				{
-					this._gameLogic.Update(this.gameBoard, Time.deltaTime);
-					await Task.Yield();
-				}
+				this.RegisterNetworkUpdate();
+
+				await this._serverTcs.Task;
 			}
-			catch (Exception ex)
+			finally
 			{
-				Debug.LogException(ex);
-				throw;
+				this.UnregisterNetworkUpdate();
 			}
 		}
 
@@ -101,6 +99,8 @@ namespace UNTP
 			this._networkManager.Shutdown();
 		}
 
+		public void NetworkUpdate(NetworkUpdateStage updateStage) => this._gameLogic.Update(this.gameBoard, Time.deltaTime);
+
 		private async Task RunServerAdvertisement()
 		{
 			this._serverAdvertisementCts = new CancellationTokenSource();
@@ -120,6 +120,8 @@ namespace UNTP
 		{
 			Debug.Log("Server started");
 
+			this._serverTcs = new TaskCompletionSource<bool>();
+
 			this._gameBoard = this._gameBoardFactory.Create(this._networkManager.LocalClientId, float3.zero, quaternion.identity);
 			this._gameBoard.NetworkObject.Spawn();
 		}
@@ -127,6 +129,9 @@ namespace UNTP
 		private void OnServerStopped(bool obj)
 		{
 			Debug.Log("Server stopped");
+
+			this._serverTcs.SetResult(false);
+			this._serverTcs = null;
 
 			this._gameBoard = null;
 		}

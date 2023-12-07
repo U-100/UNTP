@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace UNTP
 {
-	public class ClientGameplay : IGameplay
+	public class ClientGameplay : IGameplay, INetworkUpdateSystem
 	{
 		private readonly NetworkDiscovery _networkDiscovery;
 		private readonly NetworkManager _networkManager;
@@ -20,6 +20,7 @@ namespace UNTP
 		private readonly List<IDisposable> _disposables = new();
 
 		private CancellationTokenSource _searchForServersCts;
+		private TaskCompletionSource<bool> _clientTcs;
 		private NetworkGameBoard _gameBoard;
 
 		public ClientGameplay(NetworkDiscovery networkDiscovery, NetworkManager networkManager, ushort connectionPort, INetworkPrefabFactory<NetworkGameBoard> gameBoardFactory, IGameLogic gameLogic)
@@ -85,8 +86,6 @@ namespace UNTP
 			IPEndPoint ipEndPoint = null;
 			try
 			{
-				await Task.Delay(1000, this._searchForServersCts.Token); // intentional delay for testing
-
 				ipEndPoint = await FindFirstServer(this._searchForServersCts.Token);
 			}
 			catch (OperationCanceledException) { /*suppressed*/ }
@@ -96,20 +95,22 @@ namespace UNTP
 				this._searchForServersCts = null;
 			}
 
-			if (ipEndPoint != null)
+			try
 			{
-				this._networkManager.GetComponent<UnityTransport>().SetConnectionData(ipEndPoint.Address.ToString(), this._connectionPort);
-				this._networkManager.StartClient();
-
-				Debug.Log($"Client connected to {ipEndPoint.Address}:{this._connectionPort}");
-
-				while (this._networkManager.IsClient)
+				if (ipEndPoint != null)
 				{
-					if(this.gameBoard != null)
-						this._gameLogic.Update(this.gameBoard, Time.deltaTime);
+					this._networkManager.GetComponent<UnityTransport>().SetConnectionData(ipEndPoint.Address.ToString(), this._connectionPort);
+					this._networkManager.StartClient();
 
-					await Task.Yield();
+					Debug.Log($"Client connected to {ipEndPoint.Address}:{this._connectionPort}");
+
+					this.RegisterNetworkUpdate();
+					await this._clientTcs.Task;
 				}
+			}
+			finally
+			{
+				this.UnregisterNetworkUpdate();
 			}
 		}
 
@@ -127,6 +128,12 @@ namespace UNTP
 		public void Pause() => this.gameBoard.game.Pause();
 		public void Resume() => this.gameBoard.game.Resume();
 
+		public void NetworkUpdate(NetworkUpdateStage updateStage)
+		{
+			if(this.gameBoard != null)
+				this._gameLogic.Update(this.gameBoard, Time.deltaTime);
+		}
+
 		private async Task<IPEndPoint> FindFirstServer(CancellationToken ct)
 		{
 			await foreach (IPEndPoint ipEndPoint in this._networkDiscovery.FindServers(ct))
@@ -139,12 +146,17 @@ namespace UNTP
 		private void OnClientStarted()
 		{
 			Debug.Log("Client started");
+
+			this._clientTcs = new TaskCompletionSource<bool>();
 		}
 
 		private void OnClientStopped(bool isHost)
 		{
 			Debug.Log("Client stopped");
 
+			this._clientTcs.SetResult(false);
+			this._clientTcs = null;
+			
 			this._gameBoard = null;
 		}
 	}
