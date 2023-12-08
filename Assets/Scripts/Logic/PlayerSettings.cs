@@ -20,5 +20,8 @@ namespace UNTP
 
         [SerializeField] private float _shotCooldown = 1.0f;
         public float shotCooldown => this._shotCooldown;
+
+        [SerializeField] private float _shotDistance = 10.0f;
+        public float shotDistance => this._shotDistance;
     }
 }

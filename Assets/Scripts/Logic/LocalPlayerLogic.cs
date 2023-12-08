@@ -63,8 +63,14 @@ namespace UNTP
 				localPlayerCharacter.timeSinceLastShot += deltaTime;
 				if (localPlayerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
 				{
-					localPlayerCharacter.Shoot(localPlayerCharacter.position, float3(inputFireAim.x, 0, inputFireAim.y));
 					localPlayerCharacter.timeSinceLastShot -= board.settings.playerSettings.shotCooldown;
+
+					// perform a shot here
+					float3 shotDirection = float3(inputFireAim.x, 0, inputFireAim.y);
+					float3 target = localPlayerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
+					if(board.physics.CastRay(localPlayerCharacter.position, target, out CastHit castHit))
+						target = localPlayerCharacter.position + shotDirection * castHit.distance;
+					localPlayerCharacter.Shoot(localPlayerCharacter.position, target);
 				}
 			}
 			

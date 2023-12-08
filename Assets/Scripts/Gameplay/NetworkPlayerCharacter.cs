@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.VFX;
+using UnityEngine.VFX.Utility;
 
 namespace UNTP
 {
@@ -10,7 +11,11 @@ namespace UNTP
 	public class NetworkPlayerCharacter : NetworkBehaviour, IPlayerCharacter
 	{
 		[SerializeField] private CinemachineCamera _playerCamera;
-		[SerializeField] private VisualEffect _shotEffect; 
+		[SerializeField] private VisualEffect _shotEffect;
+
+		private VFXEventAttribute _vfxEventAttribute;
+		private readonly ExposedProperty _vfxPropertySource = "source";
+		private readonly ExposedProperty _vfxPropertyTarget = "target";
 
 		public float3 position
 		{
@@ -32,16 +37,18 @@ namespace UNTP
 		
 		public float timeSinceLastShot { get; set; }
 
-		public void Shoot(float3 from, float3 direction) => ShootServerRpc(from, direction);
+		public void Shoot(float3 from, float3 target) => ShootServerRpc(from, target);
 
 		[ServerRpc]
-		private void ShootServerRpc(float3 from, float3 direction) => ShootClientRpc(from, direction);
+		private void ShootServerRpc(float3 from, float3 target) => ShootClientRpc(from, target);
 
 		[ClientRpc]
-		private void ShootClientRpc(float3 from, float3 direction)
+		private void ShootClientRpc(float3 from, float3 target)
 		{
-			this._shotEffect.transform.LookAt(from + direction);
-			this._shotEffect.Play();
+			//this._shotEffect.transform.LookAt(target);
+			this._vfxEventAttribute.SetVector3(this._vfxPropertySource, from);
+			this._vfxEventAttribute.SetVector3(this._vfxPropertyTarget, target);
+			this._shotEffect.Play(this._vfxEventAttribute);
 		}
 		
 		public CinemachineCamera playerCamera => this._playerCamera;
@@ -49,6 +56,11 @@ namespace UNTP
 		public override void OnNetworkSpawn()
 		{
 			this._playerCamera.gameObject.SetActive(this.IsClient && this.IsOwner);
+		}
+
+		void Start()
+		{
+			this._vfxEventAttribute = this._shotEffect.CreateVFXEventAttribute();
 		}
 	}
 }

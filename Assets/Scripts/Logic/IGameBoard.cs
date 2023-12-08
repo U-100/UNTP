@@ -110,7 +110,7 @@ namespace UNTP
 
 		float timeSinceLastShot { get; set; }
 		
-		void Shoot(float3 from, float3 direction);
+		void Shoot(float3 from, float3 target);
 	}
 
 	public enum ConstructionState
