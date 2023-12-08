@@ -57,13 +57,15 @@ namespace UNTP
 		{
 			IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
 
-			localPlayerCharacter.timeSinceLastShot += deltaTime;
-
 			float2 inputFireAim = board.input.fireAim;
-			if(length(inputFireAim) > 0 && localPlayerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
+			if(length(inputFireAim) > 0)
 			{
-				localPlayerCharacter.Shoot(localPlayerCharacter.position, float3(inputFireAim.x, 0, inputFireAim.y));
-				localPlayerCharacter.timeSinceLastShot = 0;
+				localPlayerCharacter.timeSinceLastShot += deltaTime;
+				if (localPlayerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
+				{
+					localPlayerCharacter.Shoot(localPlayerCharacter.position, float3(inputFireAim.x, 0, inputFireAim.y));
+					localPlayerCharacter.timeSinceLastShot -= board.settings.playerSettings.shotCooldown;
+				}
 			}
 			
 			return Status.RUNNING;
