@@ -33,7 +33,7 @@ MonoBehaviour:
     _speed: 2
     _stepHeight: 0.1
     _visionSize: 10
-    _shotCooldown: 0.25
+    _shotCooldown: 0.1
     _shotDistance: 5
   _networkWalkerPrefab: {fileID: 631194264314177072, guid: 034931b4b3106ba449873023e4e07961, type: 3}
   _networkStriderPrefab: {fileID: 3656394588385818919, guid: 2206b7d53c9268548b8de6bd3b0ddeb0, type: 3}
