@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace UNTP
@@ -12,8 +13,11 @@ namespace UNTP
         
         public List<int3> path { get; set; } = new();
         public float? selfDestructionCountdown { get; set; }
+
+        public void InitiateSelfDestruction() => InitiateSelfDestructionClientRpc();
         
-        public void InitiateSelfDestruction()
+        [ClientRpc]
+        private void InitiateSelfDestructionClientRpc()
         {
             if (this._explosionEffectTransform == null)
                 this._explosionEffectTransform = Instantiate(this._explosionEffectPrefab).transform;
