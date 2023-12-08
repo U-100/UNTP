@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.VFX;
 using UnityEngine.VFX.Utility;
 
+using static Unity.Mathematics.math;
+
 namespace UNTP
 {
 	// simple player character object whose position/rotation are synced over the network
@@ -16,6 +18,7 @@ namespace UNTP
 		private VFXEventAttribute _vfxEventAttribute;
 		private readonly ExposedProperty _vfxPropertySource = "source";
 		private readonly ExposedProperty _vfxPropertyTarget = "target";
+		private readonly ExposedProperty _vfxPropertyHitNormal = "hitNormal";
 
 		public float3 position
 		{
@@ -37,17 +40,17 @@ namespace UNTP
 		
 		public float timeSinceLastShot { get; set; }
 
-		public void Shoot(float3 from, float3 target) => ShootServerRpc(from, target);
+		public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootServerRpc(from, target, hitNormal);
 
 		[ServerRpc]
-		private void ShootServerRpc(float3 from, float3 target) => ShootClientRpc(from, target);
+		private void ShootServerRpc(float3 from, float3 target, float3 hitNormal) => ShootClientRpc(from, target, hitNormal);
 
 		[ClientRpc]
-		private void ShootClientRpc(float3 from, float3 target)
+		private void ShootClientRpc(float3 from, float3 target, float3 hitNormal)
 		{
-			//this._shotEffect.transform.LookAt(target);
 			this._vfxEventAttribute.SetVector3(this._vfxPropertySource, from);
 			this._vfxEventAttribute.SetVector3(this._vfxPropertyTarget, target);
+			this._vfxEventAttribute.SetVector3(this._vfxPropertyHitNormal, hitNormal);
 			this._shotEffect.Play(this._vfxEventAttribute);
 		}
 		

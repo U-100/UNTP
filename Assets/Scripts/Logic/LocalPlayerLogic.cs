@@ -70,7 +70,7 @@ namespace UNTP
 					float3 target = localPlayerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
 					if(board.physics.CastRay(localPlayerCharacter.position, target, out CastHit castHit))
 						target = localPlayerCharacter.position + shotDirection * castHit.distance;
-					localPlayerCharacter.Shoot(localPlayerCharacter.position, target);
+					localPlayerCharacter.Shoot(localPlayerCharacter.position, target, castHit.normal);
 				}
 			}
 			
