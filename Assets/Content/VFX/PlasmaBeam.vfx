@@ -415,7 +415,7 @@ MonoBehaviour:
   stickyNoteInfos: []
   categories:
   - name: beam
-    collapsed: 1
+    collapsed: 0
   - name: nearEnd
     collapsed: 1
   - name: arc
@@ -580,7 +580,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":0.0,"g":0.6408324241638184,"b":2.0,"a":1.0}'
+      m_SerializableObject: '{"r":0.0,"g":7.679937362670898,"b":23.968629837036134,"a":1.0}'
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -9857,7 +9857,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":0.0,"g":0.6408324241638184,"b":2.0,"a":1.0}'
+      m_SerializableObject: '{"r":0.0,"g":7.679937362670898,"b":23.968629837036134,"a":1.0}'
     m_Space: -1
   m_Property:
     name: o
