@@ -14,6 +14,7 @@ namespace UNTP
 	{
 		[SerializeField] private CinemachineCamera _playerCamera;
 		[SerializeField] private VisualEffect _shotEffect;
+		[SerializeField] private Transform _aimPositionTransform;
 
 		private VFXEventAttribute _vfxEventAttribute;
 		private readonly ExposedProperty _vfxPropertySource = "source";
@@ -48,6 +49,8 @@ namespace UNTP
 		[ClientRpc]
 		private void ShootClientRpc(float3 from, float3 target, float3 hitNormal)
 		{
+			this._aimPositionTransform.position = target;
+			
 			this._vfxEventAttribute.SetVector3(this._vfxPropertySource, from);
 			this._vfxEventAttribute.SetVector3(this._vfxPropertyTarget, target);
 			this._vfxEventAttribute.SetVector3(this._vfxPropertyHitNormal, hitNormal);
