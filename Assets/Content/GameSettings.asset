@@ -27,7 +27,7 @@ MonoBehaviour:
   _physicalChunkPrefab: {fileID: -6171339396602173047, guid: 0603fcdc2e8d25444a031def8b570873, type: 3}
   _visualChunkPrefab: {fileID: -1184203244107602237, guid: f3897d171b3c42744b79f6efb7c7e1cd, type: 3}
   _networkPlayerPrefab: {fileID: 7495347794161862392, guid: e8f8c0b43b1bb6b4f8efd87509d6a64b, type: 3}
-  _networkPlayerCharacterPrefab: {fileID: 1678561483422223249, guid: f92397884e906dd448253eb63da4b602, type: 3}
+  _networkPlayerCharacterPrefab: {fileID: 709867403580210526, guid: f92397884e906dd448253eb63da4b602, type: 3}
   _playerSettings:
     _radius: 0.4
     _speed: 2
