@@ -150,6 +150,7 @@ MonoBehaviour:
   _playerCamera: {fileID: 4243379741782652930}
   _shotEffect: {fileID: 3288202074916132361}
   _aimPositionTransform: {fileID: 8953859241704980931}
+  _animator: {fileID: 5363491691356591235}
 --- !u!1 &2835680620568798988
 GameObject:
   m_ObjectHideFlags: 0

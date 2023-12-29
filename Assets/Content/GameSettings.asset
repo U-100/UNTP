@@ -30,7 +30,7 @@ MonoBehaviour:
   _networkPlayerCharacterPrefab: {fileID: 709867403580210526, guid: f92397884e906dd448253eb63da4b602, type: 3}
   _playerSettings:
     _radius: 0.4
-    _speed: 2
+    _speed: 1.5
     _stepHeight: 0.1
     _visionSize: 10
     _shotCooldown: 0.1
