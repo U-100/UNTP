@@ -102,6 +102,8 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _NoiseAmplitude: 0.001
+    - _NoiseFrequency: 500
     - _OcclusionStrength: 1
     - _OutlineDepthStep: 0.0005
     - _OutlineDepthThreshold: 0.1
