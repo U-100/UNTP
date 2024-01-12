@@ -108,6 +108,8 @@ namespace UNTP
 		quaternion rotation { get; set; }
 		float3 forward { get; set; }
 
+		float3 shooting { get; set; }
+		
 		float timeSinceLastShot { get; set; }
 		
 		void Shoot(float3 from, float3 target, float3 hitNormal);

@@ -54,9 +54,19 @@ namespace UNTP
 
         private static Status Shoot(IGameBoard board, float deltaTime)
         {
-            IPlayerCharacter localPlayerCharacter = board.players.localPlayer.character;
-
             float2 inputFireAim = board.input.fireAim;
+
+            
+            IPlayer localPlayer = board.players.localPlayer;
+            IPlayerCamera localPlayerCamera = localPlayer.playerCamera;
+            IPlayerCharacter localPlayerCharacter = localPlayer.character;
+
+            float3 horizontalCameraForward = normalize(localPlayerCamera.forward * float3(1, 0, 1));
+            float3 horizontalCameraRight = normalize(localPlayerCamera.right * float3(1, 0, 1));
+            
+            localPlayerCharacter.shooting = horizontalCameraForward * inputFireAim.x + horizontalCameraRight * inputFireAim.y;
+            
+            
             if (length(inputFireAim) > 0)
             {
                 localPlayerCharacter.timeSinceLastShot += deltaTime;

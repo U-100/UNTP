@@ -4,11 +4,11 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.VFX;
 using UnityEngine.VFX.Utility;
+
 using static Unity.Mathematics.math;
 
 namespace UNTP
 {
-    // simple player character object whose position/rotation are synced over the network
     public class NetworkPlayerCharacter : NetworkBehaviour, IPlayerCharacter
     {
         [SerializeField] private CinemachineCamera _playerCamera;
@@ -16,6 +16,8 @@ namespace UNTP
         [SerializeField] private Transform _aimPositionTransform;
         [SerializeField] private Animator _animator;
 
+        private readonly NetworkVariable<ForceNetworkSerializeByMemcpy<float3>> _shooting = new(float3(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        
         private Transform _cachedTransform;
         private Vector3 _savedPosition;
 
@@ -45,6 +47,12 @@ namespace UNTP
             set => this.transform.forward = value;
         }
 
+        public float3 shooting
+        {
+            get => this._shooting.Value;
+            set => this._shooting.Value = value;
+        }
+        
         public float timeSinceLastShot { get; set; }
 
         public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootServerRpc(from, target, hitNormal);
