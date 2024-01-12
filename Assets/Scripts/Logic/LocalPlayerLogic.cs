@@ -1,5 +1,6 @@
 using Ugol.BehaviourTree;
 using Unity.Mathematics;
+
 using static Unity.Mathematics.math;
 
 namespace UNTP
@@ -64,8 +65,9 @@ namespace UNTP
             float3 horizontalCameraForward = normalize(localPlayerCamera.forward * float3(1, 0, 1));
             float3 horizontalCameraRight = normalize(localPlayerCamera.right * float3(1, 0, 1));
             
-            localPlayerCharacter.shooting = horizontalCameraForward * inputFireAim.x + horizontalCameraRight * inputFireAim.y;
+            localPlayerCharacter.shooting = horizontalCameraRight * inputFireAim.x + horizontalCameraForward * inputFireAim.y;
             
+            //UnityEngine.Debug.DrawRay(localPlayerCharacter.position, localPlayerCharacter.shooting, UnityEngine.Color.red);
             
             if (length(inputFireAim) > 0)
             {
