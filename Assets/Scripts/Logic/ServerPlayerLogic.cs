@@ -73,7 +73,7 @@ namespace UNTP
                     
                     float3 target = playerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
             
-                    if (board.physics.CastRay(playerCharacter.position, target, out CastHit castHit))
+                    if (board.physics.CastRay(playerCharacter.position, target, LayerMask.DEFAULT | LayerMask.ENEMY, out CastHit castHit))
                         target = playerCharacter.position + shotDirection * castHit.distance;
                     playerCharacter.Shoot(playerCharacter.position, target, castHit.normal);
                 }

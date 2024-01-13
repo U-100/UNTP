@@ -60,7 +60,8 @@ GameObject:
   - component: {fileID: 9053762623400422131}
   - component: {fileID: 3070493151816013338}
   - component: {fileID: 709867403580210526}
-  m_Layer: 0
+  - component: {fileID: 5858033767197624815}
+  m_Layer: 21
   m_Name: NetworkPlayerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,6 +152,27 @@ MonoBehaviour:
   _shotEffect: {fileID: 3288202074916132361}
   _aimPositionTransform: {fileID: 8953859241704980931}
   _animator: {fileID: 5363491691356591235}
+--- !u!135 &5858033767197624815
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903337191744601361}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.45
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2835680620568798988
 GameObject:
   m_ObjectHideFlags: 0

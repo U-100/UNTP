@@ -584,7 +584,8 @@ GameObject:
   - component: {fileID: 1361376378810678622}
   - component: {fileID: 8903551380136458102}
   - component: {fileID: 631194264314177072}
-  m_Layer: 0
+  - component: {fileID: 8070985040878969824}
+  m_Layer: 22
   m_Name: NetworkWalker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -672,6 +673,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _explosionEffectPrefab: {fileID: 7717886717559981075, guid: c172d1cf19afc4a46af534eaf42ddcd8, type: 3}
+--- !u!135 &8070985040878969824
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7945212770296830389}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &5156856866767771687
 PrefabInstance:
   m_ObjectHideFlags: 0

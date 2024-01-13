@@ -105,7 +105,7 @@ namespace UNTP
 
             localPlayer.blueprint.position = interpolatedBlueprintPos;
 
-            if (board.physics.CheckBox(newBlueprintPos + float3(0.5f), float3(0.45f)))
+            if (board.physics.CheckBox(newBlueprintPos + float3(0.5f), float3(0.45f), LayerMask.ALL))
             {
                 localPlayer.blueprint.active = false;
                 localPlayer.constructionState = ConstructionState.ConstructionRestricted;

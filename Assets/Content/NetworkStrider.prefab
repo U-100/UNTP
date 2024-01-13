@@ -1475,7 +1475,8 @@ GameObject:
   - component: {fileID: 1361376378810678622}
   - component: {fileID: 8903551380136458102}
   - component: {fileID: 3656394588385818919}
-  m_Layer: 0
+  - component: {fileID: 146741816188924102}
+  m_Layer: 22
   m_Name: NetworkStrider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1565,6 +1566,27 @@ MonoBehaviour:
   - {fileID: 5583290745346744524}
   - {fileID: 2649975425150893747}
   - {fileID: 5723121783349893980}
+--- !u!135 &146741816188924102
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7945212770296830389}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.4
+  m_Center: {x: 0, y: 0.35, z: 0}
 --- !u!1 &7993132741467191410
 GameObject:
   m_ObjectHideFlags: 0

@@ -83,7 +83,7 @@ namespace UNTP
 				return new MoveSphereResult { position = position };
 
 			float3 movementDirection = normalize(movement);
-			if (gamePhysics.CastSphere(position, radius, movementDirection, out CastHit castHit, movementDistance + skinWidth))
+			if (gamePhysics.CastSphere(position, radius, movementDirection, movementDistance + skinWidth, LayerMask.DEFAULT, out CastHit castHit))
 			{
 				float3 advancement = clamp(castHit.distance - skinWidth, 0, castHit.distance) * movementDirection;
 
