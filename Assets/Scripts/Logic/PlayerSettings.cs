@@ -23,5 +23,8 @@ namespace UNTP
 
         [SerializeField] private float _shotDistance = 10.0f;
         public float shotDistance => this._shotDistance;
+
+        [SerializeField] private float _horizontalAutoAimDegrees = 10.0f;
+        public float horizontalAutoAimDegrees => this._horizontalAutoAimDegrees;
     }
 }

@@ -47,26 +47,29 @@ namespace UNTP
                     float3 shotDirection = playerCharacter.shooting;
             
                     // find the enemy closest to shot direction
-                    // IEnemy targetEnemy = null;
-                    // float targetError = 0;
-                    // for (int enemyIndex = 0; enemyIndex < board.enemies.count; ++enemyIndex)
-                    // {
-                    //     IEnemy enemy = board.enemies[enemyIndex];
-                    //     float3 enemyDirection = enemy.position - playerCharacter.position;
-                    //     float dotDir = dot(enemyDirection, shotDirection);
-                    //     if (dotDir > 0 && length(enemyDirection) < 2 * board.settings.playerSettings.shotDistance)
-                    //     {
-                    //         float error = length(enemyDirection - dotDir * shotDirection);
-                    //         if (targetEnemy == null || error < targetError)
-                    //         {
-                    //             targetEnemy = enemy;
-                    //             targetError = error;
-                    //         }
-                    //     }
-                    // }
-                    //
-                    // if (targetEnemy != null)
-                    //     shotDirection = normalize(targetEnemy.position - playerCharacter.position);
+                    float minHorizontalDirDot = cos(radians(board.settings.playerSettings.horizontalAutoAimDegrees));
+                    IEnemy targetEnemy = null;
+                    float targetError = 0;
+                    for (int enemyIndex = 0; enemyIndex < board.enemies.count; ++enemyIndex)
+                    {
+                        IEnemy enemy = board.enemies[enemyIndex];
+                        float3 enemyDirection = enemy.position - playerCharacter.position;
+                        float3 horizontalEnemyDirection = normalizesafe(enemyDirection * float3(1, 0, 1));
+                        
+                        float horizontalDirDot = dot(horizontalEnemyDirection, shotDirection);
+                        if (horizontalDirDot > minHorizontalDirDot && length(enemyDirection) < 2 * board.settings.playerSettings.shotDistance)
+                        {
+                            float error = length(enemyDirection - shotDirection);
+                            if (targetEnemy == null || error < targetError)
+                            {
+                                targetEnemy = enemy;
+                                targetError = error;
+                            }
+                        }
+                    }
+                    
+                    if (targetEnemy != null)
+                        shotDirection = normalizesafe(targetEnemy.position - playerCharacter.position);
                     
                     float3 target = playerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
             
