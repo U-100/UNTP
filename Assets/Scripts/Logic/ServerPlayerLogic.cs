@@ -11,6 +11,9 @@ namespace UNTP
         public static void UpdatePlayers(IGameBoard board, float deltaTime)
         {
             SpawnPlayerCharacters(board);
+
+            for (int playerIndex = 0; playerIndex < board.players.count; ++playerIndex)
+                UpdatePlayerCharacter(board, board.players[playerIndex].character, deltaTime);
         }
 
         private static void SpawnPlayerCharacters(IGameBoard board)
@@ -29,6 +32,51 @@ namespace UNTP
                     board.players.CreateCharacterForPlayerAtIndex(playerIndex, playerCharacterPosition, Unity.Mathematics.quaternion.identity);
                 }
             }
+        }
+        
+        private static void UpdatePlayerCharacter(IGameBoard board, IPlayerCharacter playerCharacter, float deltaTime)
+        {
+            if (length(playerCharacter.shooting) > 0)
+            {
+                playerCharacter.timeSinceLastShot += deltaTime;
+                if (playerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
+                {
+                    playerCharacter.timeSinceLastShot -= board.settings.playerSettings.shotCooldown;
+            
+                    // perform a shot here
+                    float3 shotDirection = playerCharacter.shooting;
+            
+                    // find the enemy closest to shot direction
+                    // IEnemy targetEnemy = null;
+                    // float targetError = 0;
+                    // for (int enemyIndex = 0; enemyIndex < board.enemies.count; ++enemyIndex)
+                    // {
+                    //     IEnemy enemy = board.enemies[enemyIndex];
+                    //     float3 enemyDirection = enemy.position - playerCharacter.position;
+                    //     float dotDir = dot(enemyDirection, shotDirection);
+                    //     if (dotDir > 0 && length(enemyDirection) < 2 * board.settings.playerSettings.shotDistance)
+                    //     {
+                    //         float error = length(enemyDirection - dotDir * shotDirection);
+                    //         if (targetEnemy == null || error < targetError)
+                    //         {
+                    //             targetEnemy = enemy;
+                    //             targetError = error;
+                    //         }
+                    //     }
+                    // }
+                    //
+                    // if (targetEnemy != null)
+                    //     shotDirection = normalize(targetEnemy.position - playerCharacter.position);
+                    
+                    float3 target = playerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
+            
+                    if (board.physics.CastRay(playerCharacter.position, target, out CastHit castHit))
+                        target = playerCharacter.position + shotDirection * castHit.distance;
+                    playerCharacter.Shoot(playerCharacter.position, target, castHit.normal);
+                }
+            }
+            else
+                playerCharacter.timeSinceLastShot = 0;
         }
     }
 }

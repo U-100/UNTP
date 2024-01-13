@@ -55,10 +55,7 @@ namespace UNTP
         
         public float timeSinceLastShot { get; set; }
 
-        public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootServerRpc(from, target, hitNormal);
-
-        [ServerRpc]
-        private void ShootServerRpc(float3 from, float3 target, float3 hitNormal) => ShootClientRpc(from, target, hitNormal);
+        public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootClientRpc(from, target, hitNormal);
 
         [ClientRpc]
         private void ShootClientRpc(float3 from, float3 target, float3 hitNormal)

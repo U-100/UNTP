@@ -69,48 +69,6 @@ namespace UNTP
             
             //UnityEngine.Debug.DrawRay(localPlayerCharacter.position, localPlayerCharacter.shooting, UnityEngine.Color.red);
             
-            if (length(inputFireAim) > 0)
-            {
-                localPlayerCharacter.timeSinceLastShot += deltaTime;
-                if (localPlayerCharacter.timeSinceLastShot > board.settings.playerSettings.shotCooldown)
-                {
-                    localPlayerCharacter.timeSinceLastShot -= board.settings.playerSettings.shotCooldown;
-
-                    // perform a shot here
-                    float3 shotDirection = float3(inputFireAim.x, 0, inputFireAim.y);
-
-                    // find the enemy closest to shot direction
-                    IEnemy targetEnemy = null;
-                    float targetError = 0;
-                    for (int enemyIndex = 0; enemyIndex < board.enemies.count; ++enemyIndex)
-                    {
-                        IEnemy enemy = board.enemies[enemyIndex];
-                        float3 enemyDirection = enemy.position - localPlayerCharacter.position;
-                        float dotDir = dot(enemyDirection, shotDirection);
-                        if (dotDir > 0 && length(enemyDirection) < 2 * board.settings.playerSettings.shotDistance)
-                        {
-                            float error = length(enemyDirection - dotDir * shotDirection);
-                            if (targetEnemy == null || error < targetError)
-                            {
-                                targetEnemy = enemy;
-                                targetError = error;
-                            }
-                        }
-                    }
-
-                    if (targetEnemy != null)
-                        shotDirection = normalize(targetEnemy.position - localPlayerCharacter.position);
-                    
-                    float3 target = localPlayerCharacter.position + shotDirection * board.settings.playerSettings.shotDistance;
-
-                    if (board.physics.CastRay(localPlayerCharacter.position, target, out CastHit castHit))
-                        target = localPlayerCharacter.position + shotDirection * castHit.distance;
-                    localPlayerCharacter.Shoot(localPlayerCharacter.position, target, castHit.normal);
-                }
-            }
-            else
-                localPlayerCharacter.timeSinceLastShot = 0;
-
             return Status.RUNNING;
         }
 
