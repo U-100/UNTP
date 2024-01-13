@@ -1,4 +1,3 @@
-using System;
 using Unity.Mathematics;
 
 namespace UNTP
@@ -16,8 +15,9 @@ namespace UNTP
 	{
 		public float distance;
 		public float3 normal;
+		public ICollider collider;
 	}
-	
+
 	public interface IGamePhysics
 	{
 		bool CheckBox(float3 center, float3 halfExtents, int layerMask);

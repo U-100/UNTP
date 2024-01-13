@@ -7,6 +7,12 @@ namespace UNTP
     [Serializable]
     public class EnemySettings
     {
+        [SerializeField] private float _walkerHealth = 100.0f;
+        public float walkerHealth => this._walkerHealth;
+
+        [SerializeField] private float _striderHealth = 1000.0f;
+        public float striderHealth => this._striderHealth;
+
         [SerializeField] private float _radius = 0.3f;
         public float radius => this._radius;
 

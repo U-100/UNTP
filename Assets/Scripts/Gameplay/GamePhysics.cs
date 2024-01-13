@@ -14,6 +14,7 @@ namespace UNTP
             bool result = Physics.SphereCast(position, radius, movementDirection, out RaycastHit raycastHit, movementDistance, layerMask);
             castHit.distance = raycastHit.distance;
             castHit.normal = raycastHit.normal;
+            castHit.collider = raycastHit.collider != null ? raycastHit.collider.GetComponent<ICollider>() : null;
             return result;
         }
 
@@ -23,6 +24,7 @@ namespace UNTP
             bool result = Physics.Raycast(position, Vector3.Normalize(direction), out RaycastHit raycastHit, length(direction), layerMask);
             castHit.distance = raycastHit.distance;
             castHit.normal = raycastHit.normal;
+            castHit.collider = raycastHit.collider != null ? raycastHit.collider.GetComponent<ICollider>() : null;
             return result;
         }
     }

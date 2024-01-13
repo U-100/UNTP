@@ -144,6 +144,7 @@ namespace UNTP
 		float3 position { get; set; }
 		quaternion rotation { get; set; }
 		float3 forward { get; set; }
+		float health { get; set; }
 	}
 
 	public interface IWalker : IEnemy

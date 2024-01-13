@@ -4,7 +4,6 @@ using Ugol.UnityMathematicsExtensions;
 using Unity.Mathematics;
 
 using static Unity.Mathematics.math;
-using float3 = Unity.Mathematics.float3;
 
 namespace UNTP
 {
@@ -34,12 +33,14 @@ namespace UNTP
 				{
 					float3 striderPosition = SpatialLogic.FindSurfaceCellMidUnder(board.worldMap, proposedEnemyPosition) + float3(0, 1, 0);
 					IStrider strider = board.enemies.CreateStrider(striderPosition);
+					strider.health = board.settings.enemySettings.striderHealth;
 					SetupStriderLegs(board, strider);
 				}
 				else
 				{
 					float3 walkerPosition = SpatialLogic.GetCellWithFloorNear(board.worldMap, (int3)proposedEnemyPosition) + float3(0.5f);
-					board.enemies.CreateWalker(walkerPosition);
+					IWalker walker = board.enemies.CreateWalker(walkerPosition);
+					walker.health = board.settings.enemySettings.walkerHealth;
 				}
 			}
 		}
@@ -57,8 +58,6 @@ namespace UNTP
 		{
 			for (int enemyIndex = 0; enemyIndex < board.enemies.count;)
 			{
-				//IEnemy enemy = board.enemies[enemyIndex];
-
 				Status status = board.enemies[enemyIndex] switch
 				{
 					IWalker walker => UpdateWalker(board, walker, deltaTime),
@@ -108,65 +107,69 @@ namespace UNTP
 			return true;
 		}
 		
-		private static Status UpdateWalker(IGameBoard board, IWalker enemy, float deltaTime)
+		private static Status UpdateWalker(IGameBoard board, IWalker walker, float deltaTime)
 		{
 			float selfDestructionTime = 1.0f;
-			if (enemy.selfDestructionCountdown != null)
+			if (walker.selfDestructionCountdown != null)
 			{
-				enemy.selfDestructionCountdown -= deltaTime;
-				if (enemy.selfDestructionCountdown <= 0)
+				walker.selfDestructionCountdown -= deltaTime;
+				if (walker.selfDestructionCountdown <= 0)
 					return Status.COMPLETE;
 				
-				if (enemy.selfDestructionCountdown <= selfDestructionTime * 0.5f)
+				if (walker.selfDestructionCountdown <= selfDestructionTime * 0.5f)
 					return Status.RUNNING;
 			}
 			
-			if(!FindNearestPlayer(board, enemy.position, out float3 nearestPlayerPosition, out float distanceToNearestPlayer))
+			if(!FindNearestPlayer(board, walker.position, out float3 nearestPlayerPosition, out float distanceToNearestPlayer))
 				return Status.RUNNING; // just wait until we find nearest player
 
-			if (
-				distanceToNearestPlayer < board.settings.enemySettings.speed * selfDestructionTime + board.settings.enemySettings.radius // close enough
-				&& enemy.selfDestructionCountdown == null
-			)
+			// close enough and not detonating yet
+			if (walker.selfDestructionCountdown == null && distanceToNearestPlayer < board.settings.enemySettings.speed * selfDestructionTime + board.settings.enemySettings.radius)
 			{
-				enemy.InitiateSelfDestruction();
-				enemy.selfDestructionCountdown = selfDestructionTime;
+				walker.InitiateSelfDestruction();
+				walker.selfDestructionCountdown = selfDestructionTime;
+				return Status.RUNNING;
 			}
-
-			//if (distanceToNearestPlayer < board.settings.enemySettings.touchDistance)
-			//	return Status.COMPLETE; // finish enemy life when touched player
+			
+			// not detonating yet and has no health left
+			if (walker.selfDestructionCountdown == null && walker.health <= 0)
+			{
+				walker.InitiateSelfDestruction();
+				walker.selfDestructionCountdown = selfDestructionTime;
+				return Status.RUNNING;
+			}
 
 			// rush is allowed when we have target player and we are close enough horizontally and vertically
-			if (abs(nearestPlayerPosition.y - enemy.position.y) < board.settings.enemySettings.radius && distanceToNearestPlayer < board.settings.enemySettings.horizontalRushDistance)
+			if (abs(nearestPlayerPosition.y - walker.position.y) < board.settings.enemySettings.radius && distanceToNearestPlayer < board.settings.enemySettings.horizontalRushDistance)
 			{
-				if (enemy.selfDestructionCountdown == null)
+				if (walker.selfDestructionCountdown == null)
 				{
-					enemy.InitiateSelfDestruction();
-					enemy.selfDestructionCountdown = 2.0f;
+					walker.InitiateSelfDestruction();
+					walker.selfDestructionCountdown = 2.0f;
 				}
-				return MoveTo(board, enemy, nearestPlayerPosition, deltaTime);
+				return MoveTo(board, walker, nearestPlayerPosition, deltaTime);
 			}
 
-			if (enemy.path.Count == 0 || distance(enemy.path[^1], nearestPlayerPosition) > board.settings.enemySettings.pathEndToleranceDistance)
+			if (walker.path.Count == 0 || distance(walker.path[^1], nearestPlayerPosition) > board.settings.enemySettings.pathEndToleranceDistance)
 			{
 				// we need a new path to follow
-				int3 from = (int3)floor(enemy.position - float3(0, board.settings.enemySettings.radius, 0));
+				int3 from = (int3)floor(walker.position - float3(0, board.settings.enemySettings.radius, 0));
 				int3 maxPathAreaSize = 10;
 				int3 to = (int3)floor(nearestPlayerPosition);
 				SlopeWalker slopeWalker = new SlopeWalker(board.worldMap, from, maxPathAreaSize);
-				AStar.FindPath(slopeWalker, from, to, enemy.path);
+				AStar.FindPath(slopeWalker, from, to, walker.path);
 			}
 
 			// follow a path to player
-			if (enemy.path.Count > 0)
+			if (walker.path.Count > 0)
 			{
-				float3 position = enemy.position;
-				float3 targetCellMiddle = enemy.path[0] + float3(0.5f);
+				float3 position = walker.position;
+				float3 targetCellMiddle = walker.path[0] + float3(0.5f);
 
 				if (distance(targetCellMiddle, position) < board.settings.enemySettings.pathToleranceDistance)
-					enemy.path.RemoveAt(0);
+					walker.path.RemoveAt(0);
 
-				if (enemy.path.Count > 0)
+				if (walker.path.Count > 0)
 				{
 					// draw path for debug purposes
 					//float3 p = position;
@@ -177,16 +180,16 @@ namespace UNTP
 					//	p = pp;
 					//}
 
-					float3 targetPosition = enemy.path[0] + float3(0.5f, board.settings.enemySettings.radius, 0.5f);
+					float3 targetPosition = walker.path[0] + float3(0.5f, board.settings.enemySettings.radius, 0.5f);
 
 					//UnityEngine.Debug.DrawLine(position, targetPosition, UnityEngine.Color.cyan);
 
-					return MoveTo(board, enemy, targetPosition, deltaTime);
+					return MoveTo(board, walker, targetPosition, deltaTime);
 				}
 			}
 
 			// fallback behaviour - just move in player direction
-			return MoveTo(board, enemy, nearestPlayerPosition, deltaTime);
+			return MoveTo(board, walker, nearestPlayerPosition, deltaTime);
 		}
 
 		private const float STRIDER_HEIGHT = 3.0f;
