@@ -20,6 +20,7 @@ namespace UNTP
         
         private Transform _cachedTransform;
         private Vector3 _savedPosition;
+        private Vector3 _defaultRelativeAimPosition;
 
         private int? _speedAnimatorParamHash;
 
@@ -81,6 +82,7 @@ namespace UNTP
 
             this._cachedTransform = this.transform;
             this._savedPosition = this._cachedTransform.position;
+            this._defaultRelativeAimPosition = this._aimPositionTransform.position - this._savedPosition;
         }
 
         void Update()
@@ -93,6 +95,8 @@ namespace UNTP
                 float speed = clamp(length(positionDelta) / Time.deltaTime, 0, 3);
                 this._animator.SetFloat(this._speedAnimatorParamHash ??= Animator.StringToHash("speed"), speed);
             }
+
+            this._aimPositionTransform.position = Vector3.MoveTowards(this._aimPositionTransform.position, this._cachedTransform.TransformPoint(this._defaultRelativeAimPosition), 10 * Time.deltaTime);
         }
     }
 }
