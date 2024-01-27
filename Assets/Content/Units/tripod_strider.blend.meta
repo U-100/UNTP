@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 1b34fff827e242549b182de02aeede13
+guid: 8ab5bdfe856fed8449beee36f71f0b46
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Palette_0
+    second: {fileID: 2100000, guid: d85909a7435e0c345a64c3ea08e25dce, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -91,11 +96,11 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
