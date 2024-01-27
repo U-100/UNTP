@@ -107,9 +107,9 @@ Material:
     - _OcclusionStrength: 1
     - _OutlineDepthStep: 0.0005
     - _OutlineDepthThreshold: 0.1
-    - _OutlineNormalDotThreshold: 0.1
+    - _OutlineNormalDotThreshold: 0.075
     - _Parallax: 0.005
-    - _PixelWidth: 1
+    - _PixelWidth: 1.25
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
