@@ -13,13 +13,13 @@ namespace UNTP
 			{
 				if (!board.game.isPaused)
 				{
-					ServerPlayerLogic.UpdatePlayers(board, deltaTime);
+					PlayerLogic.ServerUpdate(board, deltaTime);
 					EnemyLogic.UpdateEnemies(board, deltaTime);
 				}
 			}
 
 			if (board.game.isClient)
-				LocalPlayerLogic.Update(board, deltaTime);
+				PlayerLogic.ClientUpdate(board, deltaTime);
 		}
 	}
 }
