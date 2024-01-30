@@ -99,7 +99,7 @@ namespace UNTP
             && UpdateChunksNearPlayer(board)
             && (
                 Move(board, deltaTime)
-                + Shoot(board, deltaTime)
+                + Aim(board, deltaTime)
                 + Construct(board, deltaTime)
             );
 
@@ -140,21 +140,22 @@ namespace UNTP
             return Status.RUNNING;
         }
 
-        private static Status Shoot(IGameBoard board, float deltaTime)
+        private static Status Aim(IGameBoard board, float deltaTime)
         {
             float2 inputFireAim = board.input.fireAim;
 
-            
             IPlayer localPlayer = board.players.localPlayer;
             IPlayerCamera localPlayerCamera = localPlayer.playerCamera;
             IPlayerCharacter localPlayerCharacter = localPlayer.character;
 
-            float3 horizontalCameraForward = normalize(localPlayerCamera.forward * float3(1, 0, 1));
-            float3 horizontalCameraRight = normalize(localPlayerCamera.right * float3(1, 0, 1));
+            float3 horizontalCameraForward = normalizesafe(localPlayerCamera.forward * float3(1, 0, 1));
+            float3 horizontalCameraRight = normalizesafe(localPlayerCamera.right * float3(1, 0, 1));
             
             localPlayerCharacter.shooting = horizontalCameraRight * inputFireAim.x + horizontalCameraForward * inputFireAim.y;
             
             //UnityEngine.Debug.DrawRay(localPlayerCharacter.position, localPlayerCharacter.shooting, UnityEngine.Color.red);
+
+            localPlayerCharacter.aimPosition = lengthsq(localPlayerCharacter.shooting) > 0 ? FindShotTarget(board, localPlayerCharacter) : localPlayerCharacter.defaultAimPosition;
             
             return Status.RUNNING;
         }

@@ -55,6 +55,14 @@ namespace UNTP
         }
         
         public float timeSinceLastShot { get; set; }
+        
+        public float3 defaultAimPosition => this._cachedTransform.TransformPoint(this._defaultRelativeAimPosition);
+        
+        public float3 aimPosition
+        {
+            get => this._aimPositionTransform.position;
+            set => this._aimPositionTransform.position = value;
+        }
 
         public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootClientRpc(from, target, hitNormal);
 
@@ -95,8 +103,6 @@ namespace UNTP
                 float speed = clamp(length(positionDelta) / Time.deltaTime, 0, 3);
                 this._animator.SetFloat(this._speedAnimatorParamHash ??= Animator.StringToHash("speed"), speed);
             }
-
-            this._aimPositionTransform.position = Vector3.MoveTowards(this._aimPositionTransform.position, this._cachedTransform.TransformPoint(this._defaultRelativeAimPosition), 10 * Time.deltaTime);
         }
     }
 }

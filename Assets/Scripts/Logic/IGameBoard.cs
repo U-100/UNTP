@@ -109,8 +109,11 @@ namespace UNTP
 		float3 forward { get; set; }
 
 		float3 shooting { get; set; }
-		
+
 		float timeSinceLastShot { get; set; }
+		
+		float3 defaultAimPosition { get; }
+		float3 aimPosition { get; set; }
 		
 		void Shoot(float3 from, float3 target, float3 hitNormal);
 	}
