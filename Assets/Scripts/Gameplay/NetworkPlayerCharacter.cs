@@ -81,16 +81,13 @@ namespace UNTP
 
         public override void OnNetworkSpawn()
         {
-            this._playerCamera.gameObject.SetActive(this.IsClient && this.IsOwner);
-        }
-
-        void Start()
-        {
-            this._vfxEventAttribute = this._shotEffect.CreateVFXEventAttribute();
-
             this._cachedTransform = this.transform;
             this._savedPosition = this._cachedTransform.position;
             this._defaultRelativeAimPosition = this._aimPositionTransform.position - this._savedPosition;
+
+            this._vfxEventAttribute = this._shotEffect.CreateVFXEventAttribute();
+
+            this._playerCamera.gameObject.SetActive(this.IsClient && this.IsOwner);
         }
 
         void Update()
