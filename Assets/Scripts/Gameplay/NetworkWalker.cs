@@ -16,7 +16,7 @@ namespace UNTP
 
         public void InitiateSelfDestruction() => InitiateSelfDestructionClientRpc();
         
-        [ClientRpc]
+        [Rpc(SendTo.ClientsAndHost)]
         private void InitiateSelfDestructionClientRpc()
         {
             if (this._explosionEffectTransform == null)

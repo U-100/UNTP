@@ -66,7 +66,7 @@ namespace UNTP
 
         public void Shoot(float3 from, float3 target, float3 hitNormal) => ShootClientRpc(from, target, hitNormal);
 
-        [ClientRpc]
+        [Rpc(SendTo.ClientsAndHost)]
         private void ShootClientRpc(float3 from, float3 target, float3 hitNormal)
         {
             this._aimPositionTransform.position = target;

@@ -22,10 +22,10 @@ namespace UNTP
 		public void Pause() => PauseServerRpc();
 		public void Resume() => ResumeServerRpc();
 
-		[ServerRpc(RequireOwnership = false)]
+		[Rpc(SendTo.Server, RequireOwnership = false)]
 		private void PauseServerRpc() => this._state.Value = NetworkGameState.Paused;
 
-		[ServerRpc(RequireOwnership = false)]
+		[Rpc(SendTo.Server, RequireOwnership = false)]
 		private void ResumeServerRpc() => this._state.Value = NetworkGameState.Playing;
 	}
 }

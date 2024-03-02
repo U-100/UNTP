@@ -105,7 +105,7 @@ namespace UNTP
         public override void OnNetworkDespawn() => ClearChunks();
 
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, RequireOwnership = false)]
         private void SetWorldMapCellAtServerRpc(int3 p, WorldMapCell worldMapCell)
         {
             this._dynamicTiles[p] = worldMapCell;
@@ -115,7 +115,7 @@ namespace UNTP
             SetWorldCellAtClientRpc(p, worldMapCell);
         }
         
-        [ClientRpc]
+        [Rpc(SendTo.ClientsAndHost)]
         private void SetWorldCellAtClientRpc(int3 p, WorldMapCell worldMapCell)
         {
             this._dynamicTiles[p] = worldMapCell;
